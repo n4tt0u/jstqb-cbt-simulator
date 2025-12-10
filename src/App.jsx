@@ -1,55 +1,35 @@
-import { useState, useEffect } from 'react'
-import Papa from 'papaparse'
+import { useState } from 'react'
 import QuestionScreen from './components/QuestionScreen'
+import StartScreen from './components/StartScreen'
 
 function App() {
   const [questions, setQuestions] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [screen, setScreen] = useState('start') // 'start' | 'question'
+  const [mode, setMode] = useState(null) // 'practice' | 'exam'
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState({}) // { questionId: selectedOptionId }
   const [reviewFlags, setReviewFlags] = useState({}) // { questionId: boolean }
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const response = await fetch('/questions.csv')
-        const reader = response.body.getReader()
-        const result = await reader.read()
-        const decoder = new TextDecoder('utf-8')
-        const csv = decoder.decode(result.value)
+  // StartScreenから呼ばれる: データ読み込み完了時
+  const handleQuestionsLoaded = (data) => {
+    setQuestions(data)
+  }
 
-        Papa.parse(csv, {
-          header: true,
-          skipEmptyLines: true,
-          complete: (results) => {
-            // IDなどを数値型に変換しておく
-            const formattedData = results.data.map(q => ({
-              ...q,
-              id: Number(q.id),
-              correct_option: Number(q.correct_option)
-            }))
-            setQuestions(formattedData)
-            setLoading(false)
-          },
-          error: (error) => {
-            console.error('Error parsing CSV:', error)
-            setLoading(false)
-          }
-        })
-      } catch (error) {
-        console.error('Error fetching CSV:', error)
-        setLoading(false)
-      }
-    }
-
-    fetchQuestions()
-  }, [])
+  // StartScreenから呼ばれる: モード選択・開始時
+  const handleStart = (selectedMode) => {
+    setMode(selectedMode)
+    setScreen('question')
+    setCurrentQuestionIndex(0)
+    setUserAnswers({})
+    setReviewFlags({})
+  }
 
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1)
     } else {
-      alert("最後の問題です")
+      alert("最後の問題です。後ほど結果画面を実装します。")
     }
   }
 
@@ -75,24 +55,38 @@ function App() {
     }))
   }
 
-  if (loading) return <div style={{ padding: 20 }}>Loading questions...</div>
-  if (questions.length === 0) return <div style={{ padding: 20 }}>No questions found.</div>
+  // 画面振り分け
+  if (screen === 'start') {
+    return (
+      <StartScreen
+        onQuestionsLoaded={handleQuestionsLoaded}
+        onStart={handleStart}
+      />
+    )
+  }
 
-  const currentQuestion = questions[currentQuestionIndex]
+  if (screen === 'question') {
+    const currentQuestion = questions[currentQuestionIndex]
+    // データがない場合のガード（通常ありえないが念のため）
+    if (!currentQuestion) return <div>Loading...</div>
 
-  return (
-    <QuestionScreen
-      question={currentQuestion}
-      currentIndex={currentQuestionIndex}
-      totalQuestions={questions.length}
-      onNext={handleNext}
-      onPrev={handlePrev}
-      selectedOption={userAnswers[currentQuestion.id] || null}
-      onOptionSelect={handleOptionSelect}
-      isFlagged={!!reviewFlags[currentQuestion.id]}
-      onFlagToggle={handleFlagToggle}
-    />
-  )
+    return (
+      <QuestionScreen
+        question={currentQuestion}
+        currentIndex={currentQuestionIndex}
+        totalQuestions={questions.length}
+        onNext={handleNext}
+        onPrev={handlePrev}
+        selectedOption={userAnswers[currentQuestion.id] || null}
+        onOptionSelect={handleOptionSelect}
+        isFlagged={!!reviewFlags[currentQuestion.id]}
+        onFlagToggle={handleFlagToggle}
+        mode={mode}
+      />
+    )
+  }
+
+  return <div>Unknown Error</div>
 }
 
 export default App
