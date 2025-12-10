@@ -39,6 +39,10 @@ function App() {
     setQuestions([])
   }
 
+  const handleJump = (index) => {
+    setCurrentQuestionIndex(index)
+  }
+
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1)
@@ -85,11 +89,15 @@ function App() {
     return (
       <QuestionScreen
         question={currentQuestion}
+        questions={questions} // 全問題データが必要（リスト表示のため）
         currentIndex={currentQuestionIndex}
         totalQuestions={questions.length}
         onNext={handleNext}
         onPrev={handlePrev}
+        onJump={handleJump} // ジャンプ機能
         selectedOption={userAnswers[currentQuestion.id] || null}
+        userAnswers={userAnswers} // 全回答データ（リスト表示判定用）
+        reviewFlags={reviewFlags} // 全フラグデータ（リスト表示判定用）
         onOptionSelect={handleOptionSelect}
         isFlagged={!!reviewFlags[currentQuestion.id]}
         onFlagToggle={handleFlagToggle}

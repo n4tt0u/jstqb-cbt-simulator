@@ -3,11 +3,15 @@ import '../index.css'
 
 const QuestionScreen = ({
     question,
+    questions, // 全問題リスト (ID参照用)
     currentIndex,
     totalQuestions,
     onNext,
     onPrev,
+    onJump,
     selectedOption,
+    userAnswers, // 全回答状況
+    reviewFlags, // 全フラグ状況
     onOptionSelect,
     isFlagged,
     onFlagToggle,
@@ -15,6 +19,7 @@ const QuestionScreen = ({
     onFinish
 }) => {
     const [showFeedback, setShowFeedback] = useState(false)
+    const [showQuestionsList, setShowQuestionsList] = useState(false)
 
     // 問題が変わったら解説表示をリセット
     useEffect(() => {
@@ -32,7 +37,7 @@ const QuestionScreen = ({
         // 一問一答モード かつ まだ解説を表示していない場合
         if (mode === 'practice' && !showFeedback) {
             if (selectedOption === null) {
-                const confirmShow = window.confirm("回答が選択されていません。\nこのまま解説を表示しますか？")
+                const confirmShow = window.confirm("解答が選択されていません。\nこのまま解説を表示しますか？")
                 if (!confirmShow) return
             }
             setShowFeedback(true)
@@ -44,6 +49,11 @@ const QuestionScreen = ({
                 onNext()
             }
         }
+    }
+
+    const handleJumpTo = (index) => {
+        onJump(index)
+        setShowQuestionsList(false)
     }
 
     // 正誤判定
@@ -65,12 +75,14 @@ const QuestionScreen = ({
                 </div>
             </header>
 
-            {/* サブヘッダー（見直しフラグ） */}
+            {/* サブヘッダー (見直しフラグ) */}
             <div className="cbt-sub-header">
-                <div className="review-flag" onClick={onFlagToggle}>
-                    <span className={`flag-icon ${isFlagged ? 'active' : ''}`}>⚑</span>
-                    <span>後で見直す</span>
-                </div>
+                {mode === 'exam' && (
+                    <div className="review-flag" onClick={onFlagToggle}>
+                        <span className={`flag-icon ${isFlagged ? 'active' : ''}`}>⚑</span>
+                        <span>後で見直す</span>
+                    </div>
+                )}
             </div>
 
             {/* メインエリア */}
@@ -80,43 +92,37 @@ const QuestionScreen = ({
                 </div>
 
                 <div className="options-area">
-                    {options.map((opt) => {
-                        // 解説表示中は、正解・不正解の色付けなどを行っても良いが
-                        // シンプルに「選択したものがどれか」はわかるようにしておく
-                        return (
-                            <label key={opt.id} className="option-label" style={{
-                                cursor: showFeedback ? 'default' : 'pointer',
-                                background: showFeedback && opt.id === question.correct_option ? '#e6ffe6' : // 正解の選択肢を少し緑に
-                                    showFeedback && opt.id === selectedOption && opt.id !== question.correct_option ? '#ffe6e6' : // 間違えた選択肢を少し赤に
-                                        'white'
-                            }}>
-                                <input
-                                    type="radio"
-                                    name="option"
-                                    value={opt.id}
-                                    checked={selectedOption === opt.id}
-                                    onChange={() => !showFeedback && onOptionSelect(opt.id)}
-                                    disabled={showFeedback} // 解説中は変更不可
-                                />
-                                <span className="option-text">
-                                    {String.fromCharCode(96 + opt.id)}) {opt.text}
-                                </span>
-                            </label>
-                        )
-                    })}
+                    {options.map((opt) => (
+                        <label key={opt.id} className="option-label" style={{
+                            cursor: showFeedback ? 'default' : 'pointer',
+                            background: showFeedback && opt.id === question.correct_option ? '#e6ffe6' :
+                                showFeedback && opt.id === selectedOption && opt.id !== question.correct_option ? '#ffe6e6' :
+                                    'white'
+                        }}>
+                            <input
+                                type="radio"
+                                name="option"
+                                value={opt.id}
+                                checked={selectedOption === opt.id}
+                                onChange={() => !showFeedback && onOptionSelect(opt.id)}
+                                disabled={showFeedback}
+                            />
+                            <span className="option-text">
+                                {String.fromCharCode(96 + opt.id)}) {opt.text}
+                            </span>
+                        </label>
+                    ))}
                 </div>
 
-                {/* 解説エリア (一問一答モードのみ表示) */}
+                {/* 解説エリア */}
                 {showFeedback && (
                     <div className="feedback-area" style={{ marginTop: '30px', padding: '20px', background: '#f8f9fa', border: '1px solid #ddd', borderRadius: '4px' }}>
                         <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px', color: isCorrect ? 'green' : 'red' }}>
                             {isCorrect ? '✅ 正解' : '❌ 不正解'}
                         </div>
-
                         <div style={{ marginBottom: '10px' }}>
                             <strong>正解の選択肢:</strong> {String.fromCharCode(96 + question.correct_option)})
                         </div>
-
                         <div>
                             <strong>解説:</strong>
                             <p style={{ whiteSpace: 'pre-wrap', marginTop: '5px' }}>{question.explanation}</p>
@@ -131,13 +137,18 @@ const QuestionScreen = ({
                     <button
                         className="nav-button"
                         onClick={onPrev}
-                        disabled={currentIndex === 0 || showFeedback} // 解説中も戻れるようにするかは要件次第だが、一旦戻るの禁止にしてみる（整合性のため）
+                        disabled={currentIndex === 0 || showFeedback}
                         style={{ opacity: (currentIndex === 0 || showFeedback) ? 0.5 : 1 }}
                     >
                         <span style={{ fontSize: '1.5em', fontWeight: 'bold' }}>←</span> 前へ
                     </button>
 
-                    <button className="nav-button secondary">
+                    <button
+                        className="nav-button secondary"
+                        onClick={() => setShowQuestionsList(true)}
+                        disabled={mode === 'practice'} // 一問一答モードでは無効化
+                        style={{ opacity: mode === 'practice' ? 0.3 : 1, cursor: mode === 'practice' ? 'default' : 'pointer' }}
+                    >
                         <span style={{ fontSize: '1.2em' }}>❖</span> 問題の選択
                     </button>
 
@@ -145,11 +156,94 @@ const QuestionScreen = ({
                         className="nav-button"
                         onClick={handleNextClick}
                     >
-                        {/* 一問一答モードで解説未表示なら「回答」ボタンに見せかけるのもありだが、統一して「次へ」 */}
                         {currentIndex === totalQuestions - 1 && (!showFeedback || mode === 'exam') ? '終了' : '次へ'} <span style={{ fontSize: '1.5em', fontWeight: 'bold' }}>→</span>
                     </button>
                 </div>
             </footer>
+
+            {/* 問題一覧ポップアップ */}
+            {showQuestionsList && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 2000
+                }} onClick={() => setShowQuestionsList(false)}>
+                    <div style={{
+                        background: 'white',
+                        width: '600px',
+                        maxWidth: '90%',
+                        borderRadius: '8px',
+                        padding: '20px',
+                        position: 'relative'
+                    }} onClick={(e) => e.stopPropagation()}>
+                        <h2 style={{ textAlign: 'center', color: '#006daa', marginBottom: '20px' }}>問題一覧</h2>
+
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(50px, 1fr))',
+                            gap: '10px',
+                            marginBottom: '20px'
+                        }}>
+                            {questions.map((q, idx) => {
+                                const isAnswered = userAnswers[q.id] !== undefined
+                                const isCurrent = idx === currentIndex
+                                const hasFlag = reviewFlags[q.id]
+
+                                return (
+                                    <button
+                                        key={q.id}
+                                        onClick={() => handleJumpTo(idx)}
+                                        style={{
+                                            padding: '10px',
+                                            border: isCurrent ? '2px solid #006daa' : '1px solid #ccc',
+                                            background: isAnswered ? '#eee' : 'white',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontWeight: isCurrent ? 'bold' : 'normal',
+                                            position: 'relative'
+                                        }}
+                                    >
+                                        {idx + 1}
+                                        {hasFlag && (
+                                            <span style={{
+                                                position: 'absolute',
+                                                top: '-5px',
+                                                right: '-5px',
+                                                color: '#ffc107',
+                                                fontSize: '1.2rem',
+                                                textShadow: '0 0 2px black'
+                                            }}>⚑</span>
+                                        )}
+                                    </button>
+                                )
+                            })}
+                        </div>
+
+                        <div style={{ textAlign: 'center' }}>
+                            <button
+                                onClick={() => setShowQuestionsList(false)}
+                                style={{
+                                    padding: '8px 20px',
+                                    background: '#666',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                閉じる
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
