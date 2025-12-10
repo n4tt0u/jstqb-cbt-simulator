@@ -11,7 +11,8 @@ const QuestionScreen = ({
     onOptionSelect,
     isFlagged,
     onFlagToggle,
-    mode // 'practice' or 'exam'
+    mode, // 'practice' or 'exam'
+    onFinish
 }) => {
     const [showFeedback, setShowFeedback] = useState(false)
 
@@ -37,7 +38,11 @@ const QuestionScreen = ({
             setShowFeedback(true)
         } else {
             // それ以外（解説表示済み、または模試モード）は次の問題へ
-            onNext()
+            if (currentIndex === totalQuestions - 1) {
+                onFinish()
+            } else {
+                onNext()
+            }
         }
     }
 

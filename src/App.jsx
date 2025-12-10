@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import QuestionScreen from './components/QuestionScreen'
 import StartScreen from './components/StartScreen'
+import ResultScreen from './components/ResultScreen'
 
 function App() {
   const [questions, setQuestions] = useState([])
-  const [screen, setScreen] = useState('start') // 'start' | 'question'
+  const [screen, setScreen] = useState('start') // 'start' | 'question' | 'result'
   const [mode, setMode] = useState(null) // 'practice' | 'exam'
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -25,11 +26,22 @@ function App() {
     setReviewFlags({})
   }
 
+  const handleFinish = () => {
+    setScreen('result')
+  }
+
+  const handleRestart = () => {
+    setScreen('start')
+    setMode(null)
+    setCurrentQuestionIndex(0)
+    setUserAnswers({})
+    setReviewFlags({})
+    setQuestions([])
+  }
+
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1)
-    } else {
-      alert("最後の問題です。後ほど結果画面を実装します。")
     }
   }
 
@@ -82,6 +94,17 @@ function App() {
         isFlagged={!!reviewFlags[currentQuestion.id]}
         onFlagToggle={handleFlagToggle}
         mode={mode}
+        onFinish={handleFinish}
+      />
+    )
+  }
+
+  if (screen === 'result') {
+    return (
+      <ResultScreen
+        questions={questions}
+        userAnswers={userAnswers}
+        onRestart={handleRestart}
       />
     )
   }
