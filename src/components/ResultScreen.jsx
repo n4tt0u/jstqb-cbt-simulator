@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const ResultScreen = ({ questions, userAnswers, onRestart }) => {
+const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSeconds }) => {
     const [selectedQuestion, setSelectedQuestion] = useState(null)
 
     // 正答数の計算
@@ -10,6 +10,24 @@ const ResultScreen = ({ questions, userAnswers, onRestart }) => {
 
     const totalCount = questions.length
     const percentage = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0
+
+    // 経過時間の計算
+    const calculateElapsedTime = () => {
+        if (timeLimit === 0) {
+            return timerSeconds
+        } else {
+            return (timeLimit * 60) - timerSeconds
+        }
+    }
+    const elapsedSeconds = calculateElapsedTime()
+
+    // 時間フォーマット
+    const formatTime = (seconds) => {
+        const absSeconds = Math.abs(seconds)
+        const m = Math.floor(absSeconds / 60)
+        const s = absSeconds % 60
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+    }
 
     const handleRowClick = (question) => {
         setSelectedQuestion(question)
@@ -54,6 +72,10 @@ const ResultScreen = ({ questions, userAnswers, onRestart }) => {
                     </div>
                     <div style={{ fontSize: '1.5rem', marginTop: '5px', color: '#666' }}>
                         正答率: {percentage}%
+                    </div>
+                    <div style={{ marginTop: '15px', fontSize: '1.2rem', color: '#333' }}>
+                        経過時間: <strong>{formatTime(elapsedSeconds)}</strong>
+                        {timeLimit > 0 && elapsedSeconds > (timeLimit * 60) && <span style={{ color: 'red', marginLeft: '10px', fontSize: '1rem' }}>(超過)</span>}
                     </div>
                 </div>
 

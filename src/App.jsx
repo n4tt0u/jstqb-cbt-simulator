@@ -2,29 +2,79 @@ import { useState } from 'react'
 import QuestionScreen from './components/QuestionScreen'
 import StartScreen from './components/StartScreen'
 import ResultScreen from './components/ResultScreen'
+import { useEffect } from 'react'
 
 function App() {
   const [questions, setQuestions] = useState([])
   const [screen, setScreen] = useState('start') // 'start' | 'question' | 'result'
   const [mode, setMode] = useState(null) // 'practice' | 'exam'
+  const [timeLimit, setTimeLimit] = useState(0) // 0:無制限(CountUp), >0:制限あり(CountDown)
+  const [timerSeconds, setTimerSeconds] = useState(0)
+  const [isTimerPaused, setIsTimerPaused] = useState(false)
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState({}) // { questionId: selectedOptionId }
   const [reviewFlags, setReviewFlags] = useState({}) // { questionId: boolean }
 
-  // StartScreenから呼ばれる: データ読み込み完了時
-  const handleQuestionsLoaded = (data) => {
-    setQuestions(data)
+  const handleQuestionsLoaded = (loadedQuestions) => {
+    setQuestions(loadedQuestions)
   }
 
-  // StartScreenから呼ばれる: モード選択・開始時
-  const handleStart = (selectedMode) => {
+  const handleStart = (selectedMode, selectedTimeLimit) => {
     setMode(selectedMode)
+    setTimeLimit(selectedTimeLimit)
+
+    // タイマー初期化
+    if (selectedTimeLimit > 0) {
+      setTimerSeconds(selectedTimeLimit * 60) // 分 -> 秒
+    } else {
+      setTimerSeconds(0) // 0からカウントアップ
+    }
+    setIsTimerPaused(false)
+
     setScreen('question')
     setCurrentQuestionIndex(0)
     setUserAnswers({})
     setReviewFlags({})
   }
+
+  // タイマー更新ループ
+  useEffect(() => {
+    if (screen !== 'question' || isTimerPaused) return
+
+    const interval = setInterval(() => {
+      setTimerSeconds(prev => {
+        if (timeLimit > 0) {
+          return prev - 1
+        } else {
+          return prev + 1
+        }
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [screen, isTimerPaused, timeLimit])
+
+  // 時間切れ判定 (サイドエフェクト)
+  useEffect(() => {
+    // 制限時間なし、またはまだ時間がある、または画面が違う場合は何もしない
+    if (timeLimit === 0 || timerSeconds !== 0 || screen !== 'question') return
+
+    // 0になった瞬間にアラート
+    const timerId = setTimeout(() => {
+      const continueExam = window.confirm("試験時間が終了しました。\n終了しますか？\n（キャンセルで継続し、超過時間を記録します）")
+      if (continueExam) {
+        handleFinish()
+      }
+    }, 10) // 少し遅延させてレンダリング完了を待つ
+
+    return () => clearTimeout(timerId)
+  }, [timerSeconds, timeLimit, screen])
+
+  const handlePauseTimer = (shouldPause) => {
+    setIsTimerPaused(shouldPause)
+  }
+
 
   const handleFinish = () => {
     setScreen('result')
@@ -103,6 +153,9 @@ function App() {
         onFlagToggle={handleFlagToggle}
         mode={mode}
         onFinish={handleFinish}
+        timerSeconds={timerSeconds}
+        timeLimit={timeLimit}
+        onPauseTimer={handlePauseTimer}
       />
     )
   }
@@ -113,6 +166,8 @@ function App() {
         questions={questions}
         userAnswers={userAnswers}
         onRestart={handleRestart}
+        timeLimit={timeLimit}
+        timerSeconds={timerSeconds}
       />
     )
   }
