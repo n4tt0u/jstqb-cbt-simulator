@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { COLORS } from '../constants/theme'
 
 const ConfirmModal = ({
@@ -10,6 +10,40 @@ const ConfirmModal = ({
     cancelText = "キャンセル",
     isAlert = false // trueならキャンセルボタンを隠して確認ボタンのみにする
 }) => {
+    const [focusedButton, setFocusedButton] = useState('confirm') // 'confirm' or 'cancel'
+
+    // モーダルが開くたびにフォーカスをリセット (confirmデフォルト)
+    useEffect(() => {
+        if (isOpen) {
+            setFocusedButton('confirm')
+        }
+    }, [isOpen])
+
+    // キーボード操作
+    useEffect(() => {
+        if (!isOpen) return
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                if (!isAlert) {
+                    setFocusedButton(prev => prev === 'confirm' ? 'cancel' : 'confirm')
+                }
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                if (focusedButton === 'confirm') {
+                    onConfirm()
+                } else if (!isAlert) {
+                    onCancel()
+                }
+            } else if (e.key === 'Escape') {
+                if (!isAlert) onCancel()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [isOpen, focusedButton, isAlert, onConfirm, onCancel])
+
     if (!isOpen) return null
 
     return (
@@ -56,7 +90,10 @@ const ConfirmModal = ({
                             cursor: 'pointer',
                             fontSize: '1rem',
                             fontWeight: 'bold',
-                            minWidth: '100px'
+                            minWidth: '100px',
+                            outline: focusedButton === 'confirm' ? `3px solid ${COLORS.TEXT_MAIN}` : 'none',
+                            outlineOffset: '2px',
+                            opacity: focusedButton === 'confirm' ? 1 : 0.8
                         }}
                     >
                         {confirmText}
@@ -74,7 +111,10 @@ const ConfirmModal = ({
                                 borderRadius: '4px',
                                 cursor: 'pointer',
                                 fontSize: '1rem',
-                                minWidth: '100px'
+                                minWidth: '100px',
+                                outline: focusedButton === 'cancel' ? `3px solid ${COLORS.TEXT_MAIN}` : 'none',
+                                outlineOffset: '2px',
+                                opacity: focusedButton === 'cancel' ? 1 : 0.8
                             }}
                         >
                             {cancelText}

@@ -29,10 +29,13 @@ const QuestionScreen = ({
     const [showQuestionsList, setShowQuestionsList] = useState(false)
     const [showFinishConfirmation, setShowFinishConfirmation] = useState(false) // 終了確認モーダル用
     const [showUnansweredModal, setShowUnansweredModal] = useState(false) // 未回答警告モーダル用
+    // キーボード操作用のフォーカス管理 (1-4, null)
+    const [focusedOptionId, setFocusedOptionId] = useState(null)
 
-    // 問題が変わったら解説表示をリセット
+    // 問題が変わったら解説表示とフォーカスをリセット
     useEffect(() => {
         setShowFeedback(false)
+        setFocusedOptionId(null) // 問題切り替え時はフォーカス外す
     }, [question.id])
 
     // 一問一答モード: 解説表示中はタイマー停止
@@ -42,7 +45,42 @@ const QuestionScreen = ({
         }
     }, [showFeedback, mode])
 
+    // キーボード操作の追加
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // モーダル表示中は操作無効
+            if (showFinishConfirmation || showUnansweredModal || showQuestionsList) return
 
+            // 解説表示中は入力を受け付けない（矢印キーによる無駄なスクロール防止等は別途考慮）
+            if (showFeedback) {
+                if (e.key === 'ArrowRight') handleNextClick() // 解説中は右キーで次へだけ許可
+                return
+            }
+
+            if (e.key === 'ArrowLeft') {
+                if (currentIndex > 0) onPrev()
+            } else if (e.key === 'ArrowRight') {
+                handleNextClick()
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault() // スクロール防止
+                setFocusedOptionId(prev => prev === null || prev === 4 ? 1 : prev + 1)
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                setFocusedOptionId(prev => prev === null || prev === 1 ? 4 : prev - 1)
+            } else if (e.key === ' ' || e.key === 'Enter') {
+                // スペースかエンターで選択確定
+                if (focusedOptionId !== null) {
+                    e.preventDefault() // スクロール等の防止
+                    onOptionSelect(focusedOptionId)
+                }
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [currentIndex, showFeedback, selectedOption, mode, totalQuestions, focusedOptionId, showFinishConfirmation, showUnansweredModal, showQuestionsList]) // モーダル状態も依存に追加
 
     const options = [
         { id: 1, text: question.option_1 },
@@ -80,7 +118,6 @@ const QuestionScreen = ({
         setShowQuestionsList(false)
     }
 
-    // 正誤判定
     const isCorrect = selectedOption === question.correct_option
 
     return (
@@ -111,7 +148,6 @@ const QuestionScreen = ({
                     <span>後で見直す</span>
                 </div>
             </div>
-
             {/* メインエリア */}
             <main className="cbt-main">
                 <div className="question-area">
@@ -124,14 +160,22 @@ const QuestionScreen = ({
                             cursor: showFeedback ? 'default' : 'pointer',
                             background: showFeedback && opt.id === question.correct_option ? COLORS.SUCCESS_BG :
                                 showFeedback && opt.id === selectedOption && opt.id !== question.correct_option ? COLORS.ERROR_BG :
-                                    COLORS.WHITE
+                                    COLORS.WHITE,
+                            // キーボードフォーカス時のスタイル (青枠などで強調)
+                            outline: focusedOptionId === opt.id ? `3px solid ${COLORS.PRIMARY}` : 'none',
+                            outlineOffset: '-2px'
                         }}>
                             <input
                                 type="radio"
                                 name="option"
                                 value={opt.id}
                                 checked={selectedOption === opt.id}
-                                onChange={() => !showFeedback && onOptionSelect(opt.id)}
+                                onChange={() => {
+                                    if (!showFeedback) {
+                                        onOptionSelect(opt.id)
+                                        setFocusedOptionId(opt.id) // マウス操作時もフォーカス同期
+                                    }
+                                }}
                                 disabled={showFeedback}
                             />
                             <span className="option-text">

@@ -132,7 +132,7 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                             disabled={loadedCount === 0}
                             className={`mode-button exam ${mode === 'exam' && loadedCount > 0 ? 'active' : ''}`}
                         >
-                            本番模試モード
+                            本番モード
                             <span className="mode-description">
                                 全て解いた後に結果を表示します
                             </span>
