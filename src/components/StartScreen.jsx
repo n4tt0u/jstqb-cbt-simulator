@@ -16,9 +16,10 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
             complete: (results) => {
                 if (results.data && results.data.length > 0) {
                     // IDなどを数値化
-                    const formattedData = results.data.map(q => ({
+                    // IDなどを数値化
+                    const formattedData = results.data.map((q, index) => ({
                         ...q,
-                        id: Number(q.id),
+                        id: index + 1, // IDはインデックスから自動採番
                         correct_option: Number(q.correct_option)
                     }))
                     onQuestionsLoaded(formattedData)

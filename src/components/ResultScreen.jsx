@@ -68,9 +68,8 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
         }
 
         // CSV生成 (入力ファイルと同じフォーマットを維持)
-        // 必要なカラム: id, question_text, option_1...option_4, correct_option, explanation
+        // 必要なカラム: question_text, option_1...option_4, correct_option, explanation
         const csvData = exportData.map(q => ({
-            id: q.id,
             question_text: q.question_text,
             option_1: q.option_1,
             option_2: q.option_2,
