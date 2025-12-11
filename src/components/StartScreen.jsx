@@ -110,6 +110,12 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                             デフォルト問題集をロード
                         </button>
 
+                        <div style={{ textAlign: 'right', marginTop: '-10px' }}>
+                            <a href="/questions.csv" download style={{ fontSize: '0.8rem', color: '#006daa', textDecoration: 'underline', cursor: 'pointer' }}>
+                                CSVテンプレートをダウンロード
+                            </a>
+                        </div>
+
                         <div style={{ position: 'relative', overflow: 'hidden', display: 'inline-block' }}>
                             <p style={{ margin: '0 0 5px', fontSize: '0.9rem', color: '#666' }}>または CSVファイルをアップロード</p>
                             <input
@@ -209,25 +215,7 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                             試験開始
                         </button>
 
-                        {/* Debug Button */}
-                        <button
-                            onClick={() => onStart(mode, 5 / 60)} // 5 seconds
-                            disabled={loadedCount === 0}
-                            style={{
-                                marginTop: '5px',
-                                padding: '5px',
-                                background: '#666',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontSize: '0.8rem',
-                                width: 'fit-content',
-                                alignSelf: 'center'
-                            }}
-                        >
-                            [Debug] 5秒で開始
-                        </button>
+
                     </div>
                 </div>
 
