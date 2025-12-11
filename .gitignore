@@ -25,3 +25,6 @@ dist-ssr
 
 # Python
 .venv
+
+# Misc
+lint_output.txt

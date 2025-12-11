@@ -1,7 +1,7 @@
-# Project Analysis Tasks
+# プロジェクト分析タスク
 
-- [x] Analyze project directory structure
-- [x] Analyze main application logic (`App.jsx`)
-- [x] Analyze component architecture (`src/components`)
-- [x] Analyze data schema (`public/questions.csv`)
-- [x] Summarize findings for the user
+- [x] プロジェクトのディレクトリ構成を分析
+- [x] メインアプリケーションロジック (`App.jsx`) を分析
+- [x] コンポーネントアーキテクチャ (`src/components`) を分析
+- [x] データスキーマ (`public/questions.csv`) を分析
+- [x] 分析結果をユーザー向けにまとめる
