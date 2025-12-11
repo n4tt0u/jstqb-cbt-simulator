@@ -16,11 +16,18 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
             complete: (results) => {
                 if (results.data && results.data.length > 0) {
                     // IDなどを数値化
-                    const formattedData = results.data.map((q, index) => ({
-                        ...q,
-                        id: index + 1, // IDはインデックスから自動採番
-                        correct_option: Number(q.correct_option)
-                    }))
+                    const formattedData = results.data.map((q, index) => {
+                        let correctRaw = q.correct_option
+                        // "option_1" のような形式なら数字のみ抽出
+                        if (typeof correctRaw === 'string' && correctRaw.startsWith('option_')) {
+                            correctRaw = correctRaw.replace('option_', '')
+                        }
+                        return {
+                            ...q,
+                            id: index + 1, // IDはインデックスから自動採番
+                            correct_option: Number(correctRaw)
+                        }
+                    })
                     onQuestionsLoaded(formattedData)
                     setLoadedCount(formattedData.length)
                     setLoading(false)
