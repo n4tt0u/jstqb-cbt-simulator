@@ -86,12 +86,20 @@ function App() {
     }))
   }
 
-  const handleFlagToggle = () => {
-    const currentQuestion = questions[currentQuestionIndex]
-    setReviewFlags(prev => ({
-      ...prev,
-      [currentQuestion.id]: !prev[currentQuestion.id]
-    }))
+  const handleFlagToggle = (questionId = null) => {
+    // 引数でIDが渡された場合はそれを、なければ現在の問題のIDを使用
+    let targetId = questionId
+    if (typeof questionId !== 'number' && typeof questionId !== 'string') {
+      const currentQuestion = questions[currentQuestionIndex]
+      targetId = currentQuestion ? currentQuestion.id : null
+    }
+
+    if (targetId !== null) {
+      setReviewFlags(prev => ({
+        ...prev,
+        [targetId]: !prev[targetId]
+      }))
+    }
   }
 
   // 画面振り分け
@@ -135,6 +143,7 @@ function App() {
           timeLimit={timeLimit}
           timerSeconds={finalTimerSeconds}
           reviewFlags={reviewFlags}
+          toggleReviewFlag={handleFlagToggle}
         />
       )}
 

@@ -1,9 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import Papa from 'papaparse'
 import { COLORS } from '../constants/theme'
 import ExplanationModal from './ExplanationModal'
 
-const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSeconds, reviewFlags }) => {
+const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSeconds, reviewFlags, toggleReviewFlag }) => {
     const [selectedQuestion, setSelectedQuestion] = useState(null)
+    const [exportIncorrect, setExportIncorrect] = useState(true)
+    const [exportFlagged, setExportFlagged] = useState(false)
+
+    // UI制御用のフラグ計算
+    const hasIncorrect = questions.some(q => userAnswers[q.id] !== q.correct_option)
+    const hasFlagged = questions.some(q => reviewFlags && reviewFlags[q.id])
+
+    // データが存在しない場合はチェックを外す（初期表示時などの整合性）
+    useEffect(() => {
+        if (!hasIncorrect && exportIncorrect) setExportIncorrect(false)
+        if (!hasFlagged && exportFlagged) setExportFlagged(false)
+    }, [hasIncorrect, hasFlagged, exportIncorrect, exportFlagged])
 
     // 正答数の計算
     const correctCount = questions.reduce((count, q) => {
@@ -37,6 +50,47 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
 
     const handleClosePopup = () => {
         setSelectedQuestion(null)
+    }
+
+    const handleExportCSV = () => {
+        // 抽出ロジック
+        const exportData = questions.filter(q => {
+            const isCorrect = userAnswers[q.id] === q.correct_option
+            const hasFlag = reviewFlags[q.id]
+
+            if (exportIncorrect && !isCorrect) return true
+            if (exportFlagged && hasFlag) return true
+            return false
+        })
+
+        if (exportData.length === 0) {
+            return
+        }
+
+        // CSV生成 (入力ファイルと同じフォーマットを維持)
+        // 必要なカラム: id, question_text, option_1...option_4, correct_option, explanation
+        const csvData = exportData.map(q => ({
+            id: q.id,
+            question_text: q.question_text,
+            option_1: q.option_1,
+            option_2: q.option_2,
+            option_3: q.option_3,
+            option_4: q.option_4,
+            correct_option: q.correct_option,
+            explanation: q.explanation
+        }))
+
+        // Excel文字化け対策 (BOM)
+        const csv = Papa.unparse(csvData)
+        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' })
+
+        // ダウンロードリンク生成
+        const link = document.createElement('a')
+        const date = new Date()
+        const dateStr = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}_${String(date.getHours()).padStart(2, '0')}${String(date.getMinutes()).padStart(2, '0')}`
+        link.href = URL.createObjectURL(blob)
+        link.download = `review_${dateStr}.csv`
+        link.click()
     }
 
     return (
@@ -82,7 +136,9 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
                 </div>
 
 
-                <h3 style={{ marginBottom: '15px', color: COLORS.TEXT_MAIN }}>正誤一覧 (クリックで解説)</h3>
+                <h3 style={{ marginBottom: '15px', color: COLORS.TEXT_MAIN }}>
+                    正誤一覧 <span style={{ fontSize: '0.85rem', fontWeight: 'normal', marginLeft: '10px' }}>※行クリックで解説表示 / ⚑クリックでフラグ切替</span>
+                </h3>
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(3, 1fr)', // 3列固定
@@ -119,13 +175,25 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
                                     {/* フラグアイコン */}
                                     <span style={{
                                         marginRight: '10px',
-                                        fontSize: '1.2rem',
+                                        fontSize: '1.8rem', // サイズアップ
                                         color: hasFlag ? COLORS.PRIMARY : 'transparent',
                                         WebkitTextStroke: hasFlag ? '0px' : `1.5px ${COLORS.SUB_HEADER}`,
                                         display: 'inline-block',
-                                        width: '20px',
-                                        textAlign: 'center'
-                                    }}>
+                                        width: '30px', // ヒットエリア拡大
+                                        height: '30px',
+                                        lineHeight: '30px',
+                                        textAlign: 'center',
+                                        cursor: 'pointer', // クリック可能に
+                                        borderRadius: '50%', // 円形にして
+                                        transition: 'background 0.2s'
+                                    }}
+                                        onMouseEnter={(e) => e.target.style.background = '#eef'}
+                                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
+
+                                        onClick={(e) => {
+                                            e.stopPropagation() // 行クリック（解説表示）を阻止
+                                            toggleReviewFlag(q.id)
+                                        }}>
                                         ⚑
                                     </span>
                                     <span style={{ color: COLORS.TEXT_SUB }}>問題 {index + 1}</span>
@@ -137,6 +205,66 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
                             </div>
                         )
                     })}
+                </div>
+
+                {/* エクスポート UI */}
+                <div style={{
+                    textAlign: 'center',
+                    marginBottom: '30px',
+                    padding: '20px',
+                    background: '#f9f9f9',
+                    borderRadius: '8px',
+                    border: `1px solid ${COLORS.BORDER}`
+                }}>
+                    <h3 style={{ marginBottom: '15px', fontSize: '1.1rem', color: COLORS.TEXT_MAIN }}>復習用データのエクスポート</h3>
+                    <div style={{ marginBottom: '15px', display: 'flex', justifyContent: 'center', gap: '20px' }}>
+                        <label style={{
+                            cursor: hasIncorrect ? 'pointer' : 'not-allowed',
+                            display: 'flex',
+                            alignItems: 'center',
+                            opacity: hasIncorrect ? 1 : 0.5
+                        }}>
+                            <input
+                                type="checkbox"
+                                checked={exportIncorrect}
+                                onChange={(e) => setExportIncorrect(e.target.checked)}
+                                disabled={!hasIncorrect}
+                                style={{ marginRight: '5px' }}
+                            />
+                            不正解問題
+                        </label>
+                        <label style={{
+                            cursor: hasFlagged ? 'pointer' : 'not-allowed',
+                            display: 'flex',
+                            alignItems: 'center',
+                            opacity: hasFlagged ? 1 : 0.5
+                        }}>
+                            <input
+                                type="checkbox"
+                                checked={exportFlagged}
+                                onChange={(e) => setExportFlagged(e.target.checked)}
+                                disabled={!hasFlagged}
+                                style={{ marginRight: '5px' }}
+                            />
+                            フラグ付き問題
+                        </label>
+                    </div>
+                    <button
+                        onClick={handleExportCSV}
+                        disabled={!exportIncorrect && !exportFlagged}
+                        style={{
+                            padding: '10px 25px',
+                            background: (!exportIncorrect && !exportFlagged) ? '#ccc' : COLORS.SUB_HEADER,
+                            color: COLORS.WHITE,
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontSize: '1rem',
+                            cursor: (!exportIncorrect && !exportFlagged) ? 'not-allowed' : 'pointer',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        復習用CSVをエクスポート
+                    </button>
                 </div>
 
                 {/* フッターアクション */}
@@ -161,15 +289,17 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
             </div>
 
             {/* 解説ポップアップ */}
-            {selectedQuestion && (
-                <ExplanationModal
-                    question={selectedQuestion}
-                    userAnswer={userAnswers[selectedQuestion.id]}
-                    onClose={handleClosePopup}
-                />
-            )}
+            {
+                selectedQuestion && (
+                    <ExplanationModal
+                        question={selectedQuestion}
+                        userAnswer={userAnswers[selectedQuestion.id]}
+                        onClose={handleClosePopup}
+                    />
+                )
+            }
 
-        </div>
+        </div >
     )
 }
 

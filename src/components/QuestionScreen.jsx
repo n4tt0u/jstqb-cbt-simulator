@@ -111,12 +111,10 @@ const QuestionScreen = ({
 
             {/* サブヘッダー (見直しフラグ) */}
             <div className="cbt-sub-header" style={{ background: COLORS.SUB_HEADER }}>
-                {mode === 'exam' && (
-                    <div className="review-flag" onClick={onFlagToggle}>
-                        <span className={`flag-icon ${isFlagged ? 'active' : ''}`}>⚑</span>
-                        <span>後で見直す</span>
-                    </div>
-                )}
+                <div className="review-flag" onClick={onFlagToggle}>
+                    <span className={`flag-icon ${isFlagged ? 'active' : ''}`}>⚑</span>
+                    <span>後で見直す</span>
+                </div>
             </div>
 
             {/* メインエリア */}
@@ -190,7 +188,7 @@ const QuestionScreen = ({
                         className="nav-button"
                         onClick={handleNextClick}
                     >
-                        {currentIndex === totalQuestions - 1 && (!showFeedback || mode === 'exam') ? '終了' : '次へ'} <span style={{ fontSize: '1.5em', fontWeight: 'bold' }}>→</span>
+                        {currentIndex === totalQuestions - 1 ? '終了' : '次へ'} <span style={{ fontSize: '1.5em', fontWeight: 'bold' }}>→</span>
                     </button>
                 </div>
             </footer>
