@@ -121,7 +121,7 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                         <button
                             onClick={() => setMode('practice')}
                             disabled={loadedCount === 0}
-                            className={`mode-button practice ${mode === 'practice' ? 'active' : ''}`}
+                            className={`mode-button practice ${mode === 'practice' && loadedCount > 0 ? 'active' : ''}`}
                         >
                             一問一答モード
                             <span className="mode-description">
@@ -132,7 +132,7 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                         <button
                             onClick={() => setMode('exam')}
                             disabled={loadedCount === 0}
-                            className={`mode-button exam ${mode === 'exam' ? 'active' : ''}`}
+                            className={`mode-button exam ${mode === 'exam' && loadedCount > 0 ? 'active' : ''}`}
                         >
                             本番模試モード
                             <span className="mode-description">
