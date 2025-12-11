@@ -3,7 +3,7 @@
 JSTQB（ソフトウェアテスト技術者資格）のCBT（Computer Based Testing）試験を模擬するためのWebアプリケーションです。
 React + Vite で構築されており、CSVファイルを編集するだけで独自の問題セットを作成・練習できます。
 
-![License](https://img.shields.io/github/license/n4tt0u/cbt-simulator)
+![License](https://img.shields.io/github/license/n4tt0u/jstqb-cbt-simulator)
 
 ## ✨ 主な機能
 
