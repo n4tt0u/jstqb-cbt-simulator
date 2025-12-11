@@ -39,17 +39,17 @@
     - [x] 結果画面での経過時間表示
     - [x] 一問一答モードでの一時停止機能
 
-## Phase 5: Refactoring & Maintenance
+## Phase 5: リファクタリングと保守
 
-- [x] **Refactoring**
+- [x] **リファクタリング**
   - [x] `useExamTimer` フックの抽出
   - [x] `QuestionListModal`, `ExplanationModal` のコンポーネント化
   - [x] `theme.js` による定数管理
-- [x] **Bug Fixes**
+- [x] **バグ修正**
   - [x] リファクタリング後のホワイトスクリーン修正
   - [x] 結果画面でタイマーが止まらないバグ修正
   - [x] タイムアップ時のダイアログ競合による誤超過判定の修正
-- [x] **UI Updates**
+- [x] **UI改善**
   - [x] 結果画面の「問題文」列の削除 (要望対応)
   - [x] 結果画面の「回答/正解」列の削除 (要望対応)
   - [x] 結果一覧のグリッド（タイル）表示化 (要望対応)
@@ -65,34 +65,34 @@
   - [x] 制限時間の上限を9999分に変更
 
 - [ ] **5. 公開準備/品質向上** <!-- id: 16 -->
-  - (Pending future tasks)
+  - (今後のタスク)
 
-## Phase 6: Weakness Review Features
+## Phase 6: 弱点克服機能
 
-- [x] **Implementation Planning**
-  - [x] Update Requirements (`requirements.md`)
-  - [x] Create Implementation Plan (`implementation_plan.md`)
+- [x] **実装計画**
+  - [x] 要件定義書 (`requirements.md`) の更新
+  - [x] 実装計画書 (`implementation_plan.md`) の作成
 
-- [x] **Step 6-1: Flag Feature Expansion**
-  - [x] Enable Flag icon in Single-Answer Mode (`App.jsx`, `InfoPanel.jsx`)
-  - [x] Ensure flags persist correctly across modes
+- [x] **Step 6-1: フラグ機能の拡張**
+  - [x] 一問一答モードでのフラグアイコン有効化 (`App.jsx`, `InfoPanel.jsx`)
+  - [x] モード間でのフラグ状態の維持確認
 
-- [x] **Step 6-2: Result Screen Updates**
-  - [x] Make flag icons clickable/toggable in `ResultScreen.jsx`
-  - [x] Pass `toggleReviewFlag` function to `ResultScreen`
+- [x] **Step 6-2: 結果画面の更新**
+  - [x] `ResultScreen.jsx` でフラグアイコンをクリック/切替可能にする
+  - [x] `ResultScreen` に `toggleReviewFlag` 関数を渡す
 
-- [x] **Step 6-3: CSV Export Function**
-  - [x] Implement CSV generation logic (filtering incorrect/flagged)
-  - [x] Add "Export Review CSV" button in `ResultScreen`
-  - [x] Verify exported CSV can be re-imported successfully
+- [x] **Step 6-3: CSVエクスポート機能**
+  - [x] CSV生成ロジックの実装 (不正解/フラグでフィルタリング)
+  - [x] `ResultScreen` に「復習用CSVエクスポート」ボタンを追加
+  - [x] エクスポートされたCSVが正常に再インポートできるか検証
 
-## Phase 7: Refinement
+## Phase 7: リファインメント (改善)
 
-- [x] **Step 7-1: Remove ID column from CSV**
-  - [x] Update `StartScreen.jsx` to auto-generate IDs on import
-  - [x] Update `ResultScreen.jsx` to exclude ID from export
-  - [x] Update `public/questions.csv` to remove ID column
+- [x] **Step 7-1: CSVからID列を削除**
+  - [x] `StartScreen.jsx` を更新し、インポート時にIDを自動生成
+  - [x] `ResultScreen.jsx` を更新し、エクスポートからIDを除外
+  - [x] `public/questions.csv` を更新し、ID列を削除
 
-- [x] **Step 7-2: Refactor Project Structure**
-  - [x] Move `docs` directory into project root
-  - [x] Create `.venv` for development scripts
+- [x] **Step 7-2: プロジェクト構成のリファクタリング**
+  - [x] `docs` ディレクトリをプロジェクトルートに移動
+  - [x] 開発スクリプト用 `.venv` の作成
