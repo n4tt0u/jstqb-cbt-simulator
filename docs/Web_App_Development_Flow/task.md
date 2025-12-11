@@ -99,3 +99,7 @@
 
 - [x] **Step 7-3: CSVテンプレートダウンロード機能**
   - [x] `StartScreen.jsx` にデフォルトCSVのダウンロードリンクを追加
+
+- [x] **Step 7-4: デフォルト問題の更新**
+  - [x] PDFから追加問題を抽出・翻訳
+  - [x] `public/questions.csv` を更新
