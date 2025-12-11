@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { COLORS } from '../constants/theme'
 import ExplanationModal from './ExplanationModal'
 
-const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSeconds }) => {
+const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSeconds, reviewFlags }) => {
     const [selectedQuestion, setSelectedQuestion] = useState(null)
 
     // 正答数の計算
@@ -85,42 +85,53 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
                 <h3 style={{ marginBottom: '15px', color: COLORS.TEXT_MAIN }}>正誤一覧 (クリックで解説)</h3>
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
-                    gap: '15px',
-                    marginBottom: '30px'
+                    gridTemplateColumns: 'repeat(3, 1fr)', // 3列固定
+                    borderTop: `1px solid ${COLORS.BORDER}`,
+                    borderLeft: `1px solid ${COLORS.BORDER}`,
+                    marginBottom: '30px',
+                    maxHeight: '60vh',
+                    overflowY: 'auto'
                 }}>
                     {questions.map((q, index) => {
                         const isCorrect = userAnswers[q.id] === q.correct_option
+                        const hasFlag = reviewFlags && reviewFlags[q.id]
 
                         return (
                             <div
                                 key={q.id}
                                 onClick={() => handleRowClick(q)}
                                 style={{
-                                    border: `1px solid ${COLORS.BORDER}`,
-                                    borderRadius: '8px',
-                                    padding: '10px',
-                                    textAlign: 'center',
-                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '10px 15px',
+                                    borderRight: `1px solid ${COLORS.BORDER}`,
+                                    borderBottom: `1px solid ${COLORS.BORDER}`,
                                     background: COLORS.WHITE,
-                                    transition: 'transform 0.2s, box-shadow 0.2s',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                                    cursor: 'pointer',
+                                    transition: 'background 0.2s',
+                                    fontSize: '0.95rem'
                                 }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-2px)'
-                                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)'
-                                    e.currentTarget.style.borderColor = COLORS.PRIMARY
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'none'
-                                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)'
-                                    e.currentTarget.style.borderColor = COLORS.BORDER
-                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = COLORS.WHITE}
                             >
-                                <div style={{ fontSize: '0.9rem', color: COLORS.TEXT_SUB, marginBottom: '5px' }}>
-                                    No.{index + 1}
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    {/* フラグアイコン */}
+                                    <span style={{
+                                        marginRight: '10px',
+                                        fontSize: '1.2rem',
+                                        color: hasFlag ? COLORS.PRIMARY : 'transparent',
+                                        WebkitTextStroke: hasFlag ? '0px' : `1.5px ${COLORS.SUB_HEADER}`,
+                                        display: 'inline-block',
+                                        width: '20px',
+                                        textAlign: 'center'
+                                    }}>
+                                        ⚑
+                                    </span>
+                                    <span style={{ color: COLORS.TEXT_SUB }}>問題 {index + 1}</span>
                                 </div>
-                                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: isCorrect ? COLORS.SUCCESS : COLORS.ERROR }}>
+
+                                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: isCorrect ? COLORS.SUCCESS : COLORS.ERROR }}>
                                     {isCorrect ? '✅' : '❌'}
                                 </div>
                             </div>

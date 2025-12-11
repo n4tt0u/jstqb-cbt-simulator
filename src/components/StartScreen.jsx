@@ -85,7 +85,7 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                 width: '90%',
                 textAlign: 'center'
             }}>
-                <h1 style={{ color: 'rgb(0, 109, 170)', marginBottom: '30px' }}>JSTQB 再現演習 (CBT)</h1>
+                <h1 style={{ color: 'rgb(0, 109, 170)', marginBottom: '30px' }}>CBT 再現演習</h1>
 
                 {/* Step 1: データ読み込み */}
                 <div style={{ marginBottom: '30px', paddingBottom: '20px', borderBottom: '1px solid #eee' }}>
@@ -179,7 +179,10 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                                 type="number"
                                 min="0"
                                 value={timeLimit}
-                                onChange={(e) => setTimeLimit(Math.max(0, parseInt(e.target.value) || 0))}
+                                onChange={(e) => {
+                                    const val = parseInt(e.target.value) || 0
+                                    setTimeLimit(Math.min(9999, Math.max(0, val)))
+                                }}
                                 style={{ width: '60px', padding: '5px', textAlign: 'center', fontSize: '1rem', border: '1px solid #ccc', borderRadius: '4px' }}
                             />
                             <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '5px' }}>
