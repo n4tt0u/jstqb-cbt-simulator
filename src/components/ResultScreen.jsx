@@ -65,15 +65,26 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
         }
 
         // CSV生成 (入力ファイルと同じフォーマットを維持)
-        const csvData = exportData.map(q => ({
-            question_text: q.question_text,
-            option_1: q.option_1,
-            option_2: q.option_2,
-            option_3: q.option_3,
-            option_4: q.option_4,
-            correct_option: q.correct_option,
-            explanation: q.explanation
-        }))
+        // CSV生成 (入力ファイルと同じフォーマットを維持)
+        const csvData = exportData.map(q => {
+            const numToChar = (n) => {
+                if (n === 1) return 'a'
+                if (n === 2) return 'b'
+                if (n === 3) return 'c'
+                if (n === 4) return 'd'
+                return n
+            }
+
+            return {
+                question_text: q.question_text,
+                option_a: q.option_1,
+                option_b: q.option_2,
+                option_c: q.option_3,
+                option_d: q.option_4,
+                correct_option: numToChar(q.correct_option),
+                explanation: q.explanation
+            }
+        })
 
         // Excel文字化け対策 (BOM)
         const csv = Papa.unparse(csvData)
