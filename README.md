@@ -5,6 +5,11 @@ React + Vite で構築されており、CSVファイルを編集するだけで�
 
 ![License](https://img.shields.io/github/license/n4tt0u/jstqb-cbt-simulator)
 
+## 🚀 デモサイト
+
+**[https://jstqb-cbt-simulator.vercel.app](https://jstqb-cbt-simulator.vercel.app)**
+（ブラウザだけで動作確認できます）
+
 ## ✨ 主な機能
 
 - **本番モード**: 制限時間を設定して演習可能。（デフォルトは無制限）
