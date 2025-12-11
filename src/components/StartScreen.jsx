@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import Papa from 'papaparse'
+import './StartScreen.css'
 
 const StartScreen = ({ onQuestionsLoaded, onStart }) => {
     const [mode, setMode] = useState('practice')
-    const [questionsLoaded, setQuestionsLoaded] = useState(false)
     const [timeLimit, setTimeLimit] = useState(0) // デフォルト0（無制限）
     const [loading, setLoading] = useState(false)
     const [loadedCount, setLoadedCount] = useState(0)
@@ -16,7 +16,6 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
             complete: (results) => {
                 if (results.data && results.data.length > 0) {
                     // IDなどを数値化
-                    // IDなどを数値化
                     const formattedData = results.data.map((q, index) => ({
                         ...q,
                         id: index + 1, // IDはインデックスから自動採番
@@ -25,7 +24,6 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                     onQuestionsLoaded(formattedData)
                     setLoadedCount(formattedData.length)
                     setLoading(false)
-                    setQuestionsLoaded(true)
                 } else {
                     setError('有効な問題データが見つかりませんでした。')
                     setLoading(false)
@@ -76,55 +74,31 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
     }
 
     return (
-        <div className="cbt-container" style={{
-            minHeight: '100vh',
-            height: 'auto',
-            alignItems: 'center',
-            background: '#f0f4f8',
-            padding: '20px'
-        }}>
-            <div style={{
-                background: 'white',
-                padding: '40px',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                maxWidth: '500px',
-                width: '90%',
-                textAlign: 'center',
-                margin: 'auto'
-            }}>
-                <h1 style={{ color: 'rgb(0, 109, 170)', marginBottom: '30px' }}>CBT 再現演習</h1>
+        <div className="start-screen-container cbt-container">
+            <div className="start-screen-card">
+                <h1 className="start-screen-title">CBT 再現演習</h1>
 
                 {/* Step 1: データ読み込み */}
-                <div style={{ marginBottom: '30px', paddingBottom: '20px', borderBottom: '1px solid #eee' }}>
-                    <h2 style={{ fontSize: '1.1rem', marginBottom: '15px', color: '#555' }}>Step 1: 問題データの準備</h2>
+                <div className="step-section">
+                    <h2 className="step-title">Step 1: 問題データの準備</h2>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div className="button-group">
                         <button
                             onClick={handleLoadDefault}
                             disabled={loading || loadedCount > 0}
-                            style={{
-                                padding: '12px',
-                                background: 'rgb(0, 109, 170)',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: (loading || loadedCount > 0) ? 'default' : 'pointer',
-                                opacity: (loading || loadedCount > 0) ? 0.7 : 1,
-                                fontSize: '1rem'
-                            }}
+                            className="btn-load-default"
                         >
                             デフォルト問題集をロード
                         </button>
 
                         <div style={{ textAlign: 'right', marginTop: '-10px' }}>
-                            <a href="/questions.csv" download style={{ fontSize: '0.8rem', color: '#006daa', textDecoration: 'underline', cursor: 'pointer' }}>
+                            <a href="/questions.csv" download className="template-download-link">
                                 CSVテンプレートをダウンロード
                             </a>
                         </div>
 
-                        <div style={{ position: 'relative', overflow: 'hidden', display: 'inline-block' }}>
-                            <p style={{ margin: '0 0 5px', fontSize: '0.9rem', color: '#666' }}>または CSVファイルをアップロード</p>
+                        <div className="upload-section">
+                            <p className="upload-label">または CSVファイルをアップロード</p>
                             <input
                                 type="file"
                                 accept=".csv"
@@ -135,32 +109,22 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                         </div>
                     </div>
 
-                    {loading && <p style={{ color: '#666', marginTop: '10px' }}>読み込み中...</p>}
-                    {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
-                    {loadedCount > 0 && <p style={{ color: 'green', fontWeight: 'bold', marginTop: '10px' }}>✓ {loadedCount} 問の問題をロードしました</p>}
+                    {loading && <p className="status-message">読み込み中...</p>}
+                    {error && <p className="status-message status-error">{error}</p>}
+                    {loadedCount > 0 && <p className="status-message status-success">✓ {loadedCount} 問の問題をロードしました</p>}
                 </div>
 
                 {/* Step 2: モード選択 */}
                 <div>
-                    <h2 style={{ fontSize: '1.1rem', marginBottom: '15px', color: '#555' }}>Step 2: 演習モード選択</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <h2 className="step-title">Step 2: 演習モード選択</h2>
+                    <div className="button-group">
                         <button
                             onClick={() => setMode('practice')}
                             disabled={loadedCount === 0}
-                            style={{
-                                padding: '15px',
-                                background: loadedCount === 0 ? '#ddd' : (mode === 'practice' ? '#4CAF50' : '#f1f1f1'),
-                                color: mode === 'practice' ? 'white' : '#333',
-                                border: '2px solid #4CAF50',
-                                borderRadius: '4px',
-                                cursor: loadedCount === 0 ? 'not-allowed' : 'pointer',
-                                fontSize: '1.1rem',
-                                fontWeight: 'bold',
-                                transition: 'all 0.2s'
-                            }}
+                            className={`mode-button practice ${mode === 'practice' ? 'active' : ''}`}
                         >
                             一問一答モード
-                            <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'normal', marginTop: '4px' }}>
+                            <span className="mode-description">
                                 1問ごとに解説を表示します
                             </span>
                         </button>
@@ -168,26 +132,16 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                         <button
                             onClick={() => setMode('exam')}
                             disabled={loadedCount === 0}
-                            style={{
-                                padding: '15px',
-                                background: loadedCount === 0 ? '#ddd' : (mode === 'exam' ? '#FF9800' : '#f1f1f1'),
-                                color: mode === 'exam' ? 'white' : '#333',
-                                border: '2px solid #FF9800',
-                                borderRadius: '4px',
-                                cursor: loadedCount === 0 ? 'not-allowed' : 'pointer',
-                                fontSize: '1.1rem',
-                                fontWeight: 'bold',
-                                transition: 'all 0.2s'
-                            }}
+                            className={`mode-button exam ${mode === 'exam' ? 'active' : ''}`}
                         >
                             本番模試モード
-                            <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'normal', marginTop: '4px' }}>
+                            <span className="mode-description">
                                 全て解いた後に結果を表示します
                             </span>
                         </button>
 
                         {/* タイマー設定 (模試/一問一答共通) */}
-                        <div style={{ marginTop: '10px', padding: '10px', background: '#f9f9f9', borderRadius: '4px' }}>
+                        <div className="timer-section">
                             <label style={{ fontWeight: 'bold', marginRight: '10px' }}>制限時間 (分):</label>
                             <input
                                 type="number"
@@ -197,7 +151,7 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                                     const val = parseInt(e.target.value) || 0
                                     setTimeLimit(Math.min(9999, Math.max(0, val)))
                                 }}
-                                style={{ width: '60px', padding: '5px', textAlign: 'center', fontSize: '1rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                                className="timer-input"
                             />
                             <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '5px' }}>
                                 {timeLimit === 0 ? '※ 0分は時間制限なし (カウントアップ計測)' : `※ ${timeLimit}分で試験終了`}
@@ -207,22 +161,10 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                         <button
                             onClick={handleStart}
                             disabled={loadedCount === 0}
-                            style={{
-                                marginTop: '10px',
-                                padding: '15px',
-                                background: loadedCount === 0 ? '#ddd' : '#006daa',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: loadedCount === 0 ? 'not-allowed' : 'pointer',
-                                fontSize: '1.2rem',
-                                fontWeight: 'bold',
-                            }}
+                            className="btn-start"
                         >
                             試験開始
                         </button>
-
-
                     </div>
                 </div>
 

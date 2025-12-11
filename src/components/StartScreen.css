@@ -1,0 +1,169 @@
+.start-screen-container {
+  min-height: 100vh;
+  height: auto;
+  display: flex; /* Centering relies on flex in parent or itself if it was the flex container */
+  justify-content: center; /* Added for horizontal centering if needed */
+  align-items: center;
+  background: #f0f4f8;
+  padding: 20px;
+}
+
+.start-screen-card {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  margin: auto;
+}
+
+.start-screen-title {
+  color: rgb(0, 109, 170);
+  margin-bottom: 30px;
+}
+
+.step-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.step-title {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.btn-load-default {
+  padding: 12px;
+  background: rgb(0, 109, 170);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.btn-load-default:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.template-download-link {
+  font-size: 0.8rem;
+  color: #006daa;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.upload-section {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.upload-label {
+  margin: 0 0 5px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.status-message {
+  margin-top: 10px;
+}
+
+.status-error {
+  color: red;
+}
+
+.status-success {
+  color: green;
+  font-weight: bold;
+}
+
+/* Mode Selection Buttons */
+.mode-button {
+  padding: 15px;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: all 0.2s;
+  cursor: pointer;
+  background: #f1f1f1;
+  color: #333;
+}
+
+.mode-button:disabled {
+  background: #ddd;
+  border-color: #ddd; /* Reset border for disabled state if needed */
+  color: #888;
+  cursor: not-allowed;
+}
+
+.mode-button.practice {
+  border: 2px solid #4CAF50;
+}
+
+.mode-button.practice.active {
+  background: #4CAF50;
+  color: white;
+}
+
+.mode-button.exam {
+  border: 2px solid #FF9800;
+}
+
+.mode-button.exam.active {
+  background: #FF9800;
+  color: white;
+}
+
+.mode-description {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: normal;
+  margin-top: 4px;
+}
+
+/* Timer Input */
+.timer-section {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
+
+.timer-input {
+  width: 60px;
+  padding: 5px;
+  text-align: center;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn-start {
+  margin-top: 10px;
+  padding: 15px;
+  background: #006daa;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-start:disabled {
+  background: #ddd;
+  cursor: not-allowed;
+}

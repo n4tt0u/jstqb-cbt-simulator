@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Papa from 'papaparse'
-import { COLORS } from '../constants/theme'
 import ExplanationModal from './ExplanationModal'
+import './ResultScreen.css'
 
 const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSeconds, reviewFlags, toggleReviewFlag }) => {
     const [selectedQuestion, setSelectedQuestion] = useState(null)
@@ -13,10 +13,7 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
     const hasFlagged = questions.some(q => reviewFlags && reviewFlags[q.id])
 
     // データが存在しない場合はチェックを外す（初期表示時などの整合性）
-    useEffect(() => {
-        if (!hasIncorrect && exportIncorrect) setExportIncorrect(false)
-        if (!hasFlagged && exportFlagged) setExportFlagged(false)
-    }, [hasIncorrect, hasFlagged, exportIncorrect, exportFlagged])
+
 
     // 正答数の計算
     const correctCount = questions.reduce((count, q) => {
@@ -58,8 +55,8 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
             const isCorrect = userAnswers[q.id] === q.correct_option
             const hasFlag = reviewFlags[q.id]
 
-            if (exportIncorrect && !isCorrect) return true
-            if (exportFlagged && hasFlag) return true
+            if (exportIncorrect && hasIncorrect && !isCorrect) return true
+            if (exportFlagged && hasFlagged && hasFlag) return true
             return false
         })
 
@@ -68,7 +65,6 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
         }
 
         // CSV生成 (入力ファイルと同じフォーマットを維持)
-        // 必要なカラム: question_text, option_1...option_4, correct_option, explanation
         const csvData = exportData.map(q => ({
             question_text: q.question_text,
             option_1: q.option_1,
@@ -93,60 +89,32 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
     }
 
     return (
-        <div className="cbt-container" style={{ background: COLORS.BACKGROUND, overflowY: 'auto' }}>
-            <div style={{
-                maxWidth: '800px',
-                width: '95%',
-                margin: '40px auto',
-                background: COLORS.WHITE,
-                padding: '30px',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-            }}>
-                <h1 style={{
-                    textAlign: 'center',
-                    color: COLORS.PRIMARY,
-                    borderBottom: '2px solid #eee',
-                    paddingBottom: '20px',
-                    marginBottom: '30px'
-                }}>
+        <div className="cbt-container result-screen-container">
+            <div className="result-screen-card">
+                <h1 className="result-screen-title">
                     試験結果
                 </h1>
 
                 {/* スコア表示エリア */}
-                <div style={{
-                    textAlign: 'center',
-                    background: '#e3effd',
-                    padding: '20px',
-                    borderRadius: '8px',
-                    marginBottom: '30px'
-                }}>
-                    <h2 style={{ fontSize: '1.2rem', color: COLORS.TEXT_SUB, marginBottom: '10px' }}>総合スコア</h2>
-                    <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: COLORS.PRIMARY }}>
+                <div className="score-section">
+                    <h2 className="score-label">総合スコア</h2>
+                    <div className="score-value">
                         {correctCount} / {totalCount} 問
                     </div>
-                    <div style={{ fontSize: '1.5rem', marginTop: '5px', color: COLORS.TEXT_SUB }}>
+                    <div className="score-rate">
                         正答率: {percentage}%
                     </div>
-                    <div style={{ marginTop: '15px', fontSize: '1.2rem', color: COLORS.TEXT_MAIN }}>
+                    <div className="time-section">
                         経過時間: <strong>{formatTime(elapsedSeconds)}</strong>
-                        {timeLimit > 0 && elapsedSeconds > (timeLimit * 60) && <span style={{ color: COLORS.ERROR, marginLeft: '10px', fontSize: '1rem' }}>(超過)</span>}
+                        {timeLimit > 0 && elapsedSeconds > (timeLimit * 60) && <span className="status-overtime">(超過)</span>}
                     </div>
                 </div>
 
 
-                <h3 style={{ marginBottom: '15px', color: COLORS.TEXT_MAIN }}>
-                    正誤一覧 <span style={{ fontSize: '0.85rem', fontWeight: 'normal', marginLeft: '10px' }}>※行クリックで解説表示 / ⚑クリックでフラグ切替</span>
+                <h3 className="grid-title">
+                    正誤一覧 <span className="grid-note">※行クリックで解説表示 / ⚑クリックでフラグ切替</span>
                 </h3>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)', // 3列固定
-                    borderTop: `1px solid ${COLORS.BORDER}`,
-                    borderLeft: `1px solid ${COLORS.BORDER}`,
-                    marginBottom: '30px',
-                    maxHeight: '60vh',
-                    overflowY: 'auto'
-                }}>
+                <div className="questions-grid">
                     {questions.map((q, index) => {
                         const isCorrect = userAnswers[q.id] === q.correct_option
                         const hasFlag = reviewFlags && reviewFlags[q.id]
@@ -155,50 +123,23 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
                             <div
                                 key={q.id}
                                 onClick={() => handleRowClick(q)}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: '10px 15px',
-                                    borderRight: `1px solid ${COLORS.BORDER}`,
-                                    borderBottom: `1px solid ${COLORS.BORDER}`,
-                                    background: COLORS.WHITE,
-                                    cursor: 'pointer',
-                                    transition: 'background 0.2s',
-                                    fontSize: '0.95rem'
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = '#f5f5f5'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = COLORS.WHITE}
+                                className="question-tile"
                             >
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <div className="question-meta">
                                     {/* フラグアイコン */}
-                                    <span style={{
-                                        marginRight: '10px',
-                                        fontSize: '1.8rem', // サイズアップ
-                                        color: hasFlag ? COLORS.PRIMARY : 'transparent',
-                                        WebkitTextStroke: hasFlag ? '0px' : `1.5px ${COLORS.SUB_HEADER}`,
-                                        display: 'inline-block',
-                                        width: '30px', // ヒットエリア拡大
-                                        height: '30px',
-                                        lineHeight: '30px',
-                                        textAlign: 'center',
-                                        cursor: 'pointer', // クリック可能に
-                                        borderRadius: '50%', // 円形にして
-                                        transition: 'background 0.2s'
-                                    }}
-                                        onMouseEnter={(e) => e.target.style.background = '#eef'}
-                                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
-
+                                    <span
+                                        className={`tile-flag-icon ${hasFlag ? 'active' : ''}`}
                                         onClick={(e) => {
                                             e.stopPropagation() // 行クリック（解説表示）を阻止
                                             toggleReviewFlag(q.id)
-                                        }}>
+                                        }}
+                                    >
                                         ⚑
                                     </span>
-                                    <span style={{ color: COLORS.TEXT_SUB }}>問題 {index + 1}</span>
+                                    <span className="question-number-text">問題 {index + 1}</span>
                                 </div>
 
-                                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: isCorrect ? COLORS.SUCCESS : COLORS.ERROR }}>
+                                <div className={`tile-result-icon ${isCorrect ? 'icon-correct' : 'icon-incorrect'}`}>
                                     {isCorrect ? '✅' : '❌'}
                                 </div>
                             </div>
@@ -207,43 +148,24 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
                 </div>
 
                 {/* エクスポート UI */}
-                <div style={{
-                    textAlign: 'center',
-                    marginBottom: '30px',
-                    padding: '20px',
-                    background: '#f9f9f9',
-                    borderRadius: '8px',
-                    border: `1px solid ${COLORS.BORDER}`
-                }}>
-                    <h3 style={{ marginBottom: '15px', fontSize: '1.1rem', color: COLORS.TEXT_MAIN }}>復習用データのエクスポート</h3>
-                    <div style={{ marginBottom: '15px', display: 'flex', justifyContent: 'center', gap: '20px' }}>
-                        <label style={{
-                            cursor: hasIncorrect ? 'pointer' : 'not-allowed',
-                            display: 'flex',
-                            alignItems: 'center',
-                            opacity: hasIncorrect ? 1 : 0.5
-                        }}>
+                <div className="export-section">
+                    <h3 className="export-title">復習用データのエクスポート</h3>
+                    <div className="export-options">
+                        <label className={`export-label ${!hasIncorrect ? 'disabled' : ''}`}>
                             <input
                                 type="checkbox"
-                                checked={exportIncorrect}
+                                checked={exportIncorrect && hasIncorrect}
                                 onChange={(e) => setExportIncorrect(e.target.checked)}
                                 disabled={!hasIncorrect}
-                                style={{ marginRight: '5px' }}
                             />
                             不正解問題
                         </label>
-                        <label style={{
-                            cursor: hasFlagged ? 'pointer' : 'not-allowed',
-                            display: 'flex',
-                            alignItems: 'center',
-                            opacity: hasFlagged ? 1 : 0.5
-                        }}>
+                        <label className={`export-label ${!hasFlagged ? 'disabled' : ''}`}>
                             <input
                                 type="checkbox"
-                                checked={exportFlagged}
+                                checked={exportFlagged && hasFlagged}
                                 onChange={(e) => setExportFlagged(e.target.checked)}
                                 disabled={!hasFlagged}
-                                style={{ marginRight: '5px' }}
                             />
                             フラグ付き問題
                         </label>
@@ -251,35 +173,17 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
                     <button
                         onClick={handleExportCSV}
                         disabled={!exportIncorrect && !exportFlagged}
-                        style={{
-                            padding: '10px 25px',
-                            background: (!exportIncorrect && !exportFlagged) ? '#ccc' : COLORS.SUB_HEADER,
-                            color: COLORS.WHITE,
-                            border: 'none',
-                            borderRadius: '4px',
-                            fontSize: '1rem',
-                            cursor: (!exportIncorrect && !exportFlagged) ? 'not-allowed' : 'pointer',
-                            fontWeight: 'bold'
-                        }}
+                        className="btn-export"
                     >
                         復習用CSVをエクスポート
                     </button>
                 </div>
 
                 {/* フッターアクション */}
-                <div style={{ textAlign: 'center' }}>
+                <div className="footer-section">
                     <button
                         onClick={onRestart}
-                        style={{
-                            padding: '12px 30px',
-                            background: COLORS.PRIMARY,
-                            color: COLORS.WHITE,
-                            border: 'none',
-                            borderRadius: '4px',
-                            fontSize: '1.1rem',
-                            cursor: 'pointer',
-                            fontWeight: 'bold'
-                        }}
+                        className="btn-restart"
                     >
                         タイトルに戻る
                     </button>
