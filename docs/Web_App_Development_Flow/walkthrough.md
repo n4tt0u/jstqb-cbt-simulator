@@ -95,7 +95,7 @@
 - [x] **CSVフォーマットの最適化**:
   - `public/questions.csv` のヘッダーを `option_1`〜`4` から `option_a`〜`d` に変更し、内部構造と統一。
   - 正解カラム (`correct_option`) の値も `1`〜`4` から `a`〜`d` に変更。
-  - `StartScreen.jsx` (インポート) と `ResultScreen.jsx` (エクスポート) のロジックを更新し、新旧フォーマットの両方に対応（内部的には数値として扱う仕様を維持）。
+  - `StartScreen.jsx` (インポート) と `ResultScreen.jsx` (エクスポート) のロジックを更新し、**新フォーマットのみに対応（後方互換性なし）**。これによりコードがシンプル化。
 
 ## 完了
 

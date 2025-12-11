@@ -19,28 +19,24 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                     // IDなどを数値化し、カラム名を内部用にマッピング
                     const formattedData = results.data.map((q, index) => {
                         // 正解オプションの変換 (a->1, b->2, c->3, d->4)
-                        let correctVal = q.correct_option
-                        if (typeof correctVal === 'string') {
-                            const lower = correctVal.toLowerCase().trim()
-                            if (lower === 'a' || lower === 'option_a') correctVal = 1
-                            else if (lower === 'b' || lower === 'option_b') correctVal = 2
-                            else if (lower === 'c' || lower === 'option_c') correctVal = 3
-                            else if (lower === 'd' || lower === 'option_d') correctVal = 4
-                            // 従来の数字形式もサポート ("1", "option_1")
-                            else if (lower.startsWith('option_')) correctVal = Number(lower.replace('option_', ''))
-                            else correctVal = Number(lower)
+                        let correctVal = 0
+                        if (q.correct_option) {
+                            const lower = String(q.correct_option).toLowerCase().trim()
+                            if (lower === 'a') correctVal = 1
+                            else if (lower === 'b') correctVal = 2
+                            else if (lower === 'c') correctVal = 3
+                            else if (lower === 'd') correctVal = 4
                         }
 
                         return {
                             ...q,
                             id: index + 1,
                             // CSVの option_a 〜 d を内部の option_1 〜 4 にマッピング
-                            option_1: q.option_a || q.option_1,
-                            option_2: q.option_b || q.option_2,
-                            option_3: q.option_c || q.option_3,
-                            option_4: q.option_d || q.option_4,
-                            correct_option: Number(correctVal),
-                            // 不要な元のキーは残っても問題ないが、綺麗にするなら削除可
+                            option_1: q.option_a,
+                            option_2: q.option_b,
+                            option_3: q.option_c,
+                            option_4: q.option_d,
+                            correct_option: correctVal,
                         }
                     })
                     onQuestionsLoaded(formattedData)
