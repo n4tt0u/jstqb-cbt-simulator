@@ -3,6 +3,7 @@ import '../index.css'
 import { COLORS } from '../constants/theme'
 import QuestionListModal from './QuestionListModal'
 import ConfirmModal from './ConfirmModal'
+import { formatTime, getTimerColor } from '../utils/timeUtils'
 
 const QuestionScreen = ({
     question,
@@ -41,13 +42,7 @@ const QuestionScreen = ({
         }
     }, [showFeedback, mode])
 
-    const formatTime = (seconds) => {
-        const absSeconds = Math.abs(seconds)
-        const m = Math.floor(absSeconds / 60)
-        const s = absSeconds % 60
-        const text = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-        return seconds < 0 ? `-${text}` : text
-    }
+
 
     const options = [
         { id: 1, text: question.option_1 },
@@ -96,7 +91,7 @@ const QuestionScreen = ({
                     <div className="info-row">
                         <span className="info-icon">🕒</span>
                         <span style={{
-                            color: timerSeconds < 0 ? COLORS.ERROR : 'inherit',
+                            color: getTimerColor(timerSeconds, timeLimit),
                             fontWeight: 'bold'
                         }}>
                             {timeLimit === 0 ? `経過時間 ${formatTime(timerSeconds)}` : `残り時間 ${formatTime(timerSeconds)}`}

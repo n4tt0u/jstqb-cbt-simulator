@@ -11,6 +11,7 @@ export const COLORS = {
     SUCCESS_BG: '#e6ffe6',
     ERROR: 'red',
     ERROR_BG: '#ffe6e6',
+    WARNING: 'rgb(255, 255, 0)', // User specified yellow
 
     // UI Elements
     BORDER: '#ddd',
