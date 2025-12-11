@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Papa from 'papaparse'
+import { parseQuestionRow } from '../utils/csvFormatter'
 import './StartScreen.css'
 
 const StartScreen = ({ onQuestionsLoaded, onStart }) => {
@@ -15,30 +16,9 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
             skipEmptyLines: true,
             complete: (results) => {
                 if (results.data && results.data.length > 0) {
-                    // IDなどを数値化
-                    // IDなどを数値化し、カラム名を内部用にマッピング
-                    const formattedData = results.data.map((q, index) => {
-                        // 正解オプションの変換 (a->1, b->2, c->3, d->4)
-                        let correctVal = 0
-                        if (q.correct_option) {
-                            const lower = String(q.correct_option).toLowerCase().trim()
-                            if (lower === 'a') correctVal = 1
-                            else if (lower === 'b') correctVal = 2
-                            else if (lower === 'c') correctVal = 3
-                            else if (lower === 'd') correctVal = 4
-                        }
+                    // ユーティリティを使用してデータを変換
+                    const formattedData = results.data.map((q, index) => parseQuestionRow(q, index))
 
-                        return {
-                            ...q,
-                            id: index + 1,
-                            // CSVの option_a 〜 d を内部の option_1 〜 4 にマッピング
-                            option_1: q.option_a,
-                            option_2: q.option_b,
-                            option_3: q.option_c,
-                            option_4: q.option_d,
-                            correct_option: correctVal,
-                        }
-                    })
                     onQuestionsLoaded(formattedData)
                     setLoadedCount(formattedData.length)
                     setLoading(false)

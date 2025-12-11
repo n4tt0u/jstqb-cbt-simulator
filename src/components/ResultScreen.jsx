@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Papa from 'papaparse'
+import { formatQuestionForExport } from '../utils/csvFormatter'
 import ExplanationModal from './ExplanationModal'
 import './ResultScreen.css'
 
@@ -65,26 +66,7 @@ const ResultScreen = ({ questions, userAnswers, onRestart, timeLimit, timerSecon
         }
 
         // CSV生成 (入力ファイルと同じフォーマットを維持)
-        // CSV生成 (入力ファイルと同じフォーマットを維持)
-        const csvData = exportData.map(q => {
-            const numToChar = (n) => {
-                if (n === 1) return 'a'
-                if (n === 2) return 'b'
-                if (n === 3) return 'c'
-                if (n === 4) return 'd'
-                return n
-            }
-
-            return {
-                question_text: q.question_text,
-                option_a: q.option_1,
-                option_b: q.option_2,
-                option_c: q.option_3,
-                option_d: q.option_4,
-                correct_option: numToChar(q.correct_option),
-                explanation: q.explanation
-            }
-        })
+        const csvData = exportData.map(q => formatQuestionForExport(q))
 
         // Excel文字化け対策 (BOM)
         const csv = Papa.unparse(csvData)
