@@ -76,7 +76,13 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
     }
 
     return (
-        <div className="cbt-container" style={{ justifyContent: 'center', alignItems: 'center', background: '#f0f4f8' }}>
+        <div className="cbt-container" style={{
+            minHeight: '100vh',
+            height: 'auto',
+            alignItems: 'center',
+            background: '#f0f4f8',
+            padding: '20px'
+        }}>
             <div style={{
                 background: 'white',
                 padding: '40px',
@@ -84,7 +90,8 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                 maxWidth: '500px',
                 width: '90%',
-                textAlign: 'center'
+                textAlign: 'center',
+                margin: 'auto'
             }}>
                 <h1 style={{ color: 'rgb(0, 109, 170)', marginBottom: '30px' }}>CBT 再現演習</h1>
 
