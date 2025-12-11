@@ -36,7 +36,7 @@ body {
 
 .cbt-header {
   height: 50px;
-  padding: 10px 20px;
+  padding: 0 20px;
   justify-content: flex-end;
   font-weight: bold;
 }
@@ -55,23 +55,25 @@ body {
 .info-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   /* アイコンと文字の間隔 */
   font-family: monospace;
   /* 数字を等幅っぽく見せる */
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .info-icon {
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 /* サブヘッダー（見直しフラグ） */
 .cbt-sub-header {
   background-color: rgb(128, 174, 225);
+  margin-top: 2px;
+  /* 青帯との隙間 */
   /* ユーザー指定カラー */
   /* 画像を模した水色のグラデーション */
-  height: 30px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -153,7 +155,7 @@ body {
 
 /* フッター (画像に合わせて調整) */
 .cbt-footer {
-  height: 50px;
+  height: 35px;
   padding: 0;
   /* paddingをなくして端まで使う */
   justify-content: flex-end;
