@@ -63,16 +63,14 @@ const QuestionScreen = ({
                 handleNextClick()
             } else if (e.key === 'ArrowDown') {
                 e.preventDefault() // スクロール防止
-                setFocusedOptionId(prev => prev === null || prev === 4 ? 1 : prev + 1)
+                const nextId = focusedOptionId === null || focusedOptionId === 4 ? 1 : focusedOptionId + 1
+                setFocusedOptionId(nextId)
+                onOptionSelect(nextId)
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault()
-                setFocusedOptionId(prev => prev === null || prev === 1 ? 4 : prev - 1)
-            } else if (e.key === ' ' || e.key === 'Enter') {
-                // スペースかエンターで選択確定
-                if (focusedOptionId !== null) {
-                    e.preventDefault() // スクロール等の防止
-                    onOptionSelect(focusedOptionId)
-                }
+                const prevId = focusedOptionId === null || focusedOptionId === 1 ? 4 : focusedOptionId - 1
+                setFocusedOptionId(prevId)
+                onOptionSelect(prevId)
             }
         }
 
@@ -80,7 +78,7 @@ const QuestionScreen = ({
         return () => {
             window.removeEventListener('keydown', handleKeyDown)
         }
-    }, [currentIndex, showFeedback, selectedOption, mode, totalQuestions, focusedOptionId, showFinishConfirmation, showUnansweredModal, showQuestionsList]) // モーダル状態も依存に追加
+    }, [currentIndex, showFeedback, selectedOption, mode, totalQuestions, focusedOptionId, showFinishConfirmation, showUnansweredModal, showQuestionsList, onOptionSelect]) // モーダル状態も依存に追加
 
     const options = [
         { id: 1, text: question.option_1 },
