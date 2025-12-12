@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Papa from 'papaparse'
 import { parseQuestionRow } from '../utils/csvFormatter'
+import { parseAnkiJson } from '../utils/ankiImport'
 import './StartScreen.css'
 
 const StartScreen = ({ onQuestionsLoaded, onStart }) => {
@@ -67,6 +68,28 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
         reader.readAsText(file)
     }
 
+    const handleAnkiImport = async () => {
+        setLoading(true)
+        setError('')
+        try {
+            const text = await navigator.clipboard.readText()
+            if (!text) {
+                setError('クリップボードが空か、テキストを取得できませんでした。')
+                setLoading(false)
+                return
+            }
+
+            const questions = parseAnkiJson(text)
+            onQuestionsLoaded(questions)
+            setLoadedCount(questions.length)
+            setLoading(false)
+        } catch (err) {
+            console.error(err)
+            setError(err.message || 'クリップボードからの読み込みに失敗しました。')
+            setLoading(false)
+        }
+    }
+
     const handleStart = () => {
         onStart(mode, timeLimit)
     }
@@ -87,6 +110,14 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                             className="btn-load-default"
                         >
                             デフォルト問題集をロード
+                        </button>
+
+                        <button
+                            onClick={handleAnkiImport}
+                            disabled={loading || loadedCount > 0}
+                            className="btn-anki-import"
+                        >
+                            📋 AnkiNLMからインポート
                         </button>
 
                         <div style={{ textAlign: 'right', marginTop: '-10px' }}>
