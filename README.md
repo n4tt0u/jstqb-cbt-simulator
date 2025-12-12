@@ -8,7 +8,6 @@ React + Vite で構築されており、CSVファイルを編集するだけで�
 ## 🚀 サイト
 
 **[https://jstqb-cbt-simulator.vercel.app](https://jstqb-cbt-simulator.vercel.app)**
-（ブラウザだけで動作確認できます）
 
 ## ✨ 主な機能
 
