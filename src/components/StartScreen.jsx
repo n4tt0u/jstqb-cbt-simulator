@@ -138,23 +138,25 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                             </span>
                         </button>
 
-                        {/* タイマー設定 (模試/一問一答共通) */}
-                        <div className="timer-section">
-                            <label style={{ fontWeight: 'bold', marginRight: '10px' }}>制限時間 (分):</label>
-                            <input
-                                type="number"
-                                min="0"
-                                value={timeLimit}
-                                onChange={(e) => {
-                                    const val = parseInt(e.target.value) || 0
-                                    setTimeLimit(Math.min(9999, Math.max(0, val)))
-                                }}
-                                className="timer-input"
-                            />
-                            <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '5px' }}>
-                                {timeLimit === 0 ? '※ 0分は時間制限なし (カウントアップ計測)' : `※ ${timeLimit}分で試験終了`}
+                        {/* タイマー設定 (模試モードのみ) */}
+                        {mode === 'exam' && (
+                            <div className="timer-section">
+                                <label style={{ fontWeight: 'bold', marginRight: '10px' }}>制限時間 (分):</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={timeLimit}
+                                    onChange={(e) => {
+                                        const val = parseInt(e.target.value) || 0
+                                        setTimeLimit(Math.min(9999, Math.max(0, val)))
+                                    }}
+                                    className="timer-input"
+                                />
+                                <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '5px' }}>
+                                    {timeLimit === 0 ? '※ 0分は時間制限なし (カウントアップ計測)' : `※ ${timeLimit}分で試験終了`}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         <button
                             onClick={handleStart}

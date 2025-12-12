@@ -125,15 +125,17 @@ const QuestionScreen = ({
             {/* ヘッダー */}
             <header className="cbt-header" style={{ background: COLORS.PRIMARY }}>
                 <div className="header-info">
-                    <div className="info-row">
-                        <span className="info-icon">🕒</span>
-                        <span style={{
-                            color: getTimerColor(timerSeconds, timeLimit),
-                            fontWeight: 'bold'
-                        }}>
-                            {timeLimit === 0 ? `経過時間 ${formatTime(timerSeconds)}` : `残り時間 ${formatTime(timerSeconds)}`}
-                        </span>
-                    </div>
+                    {mode === 'exam' && (
+                        <div className="info-row">
+                            <span className="info-icon">🕒</span>
+                            <span style={{
+                                color: getTimerColor(timerSeconds, timeLimit),
+                                fontWeight: 'bold'
+                            }}>
+                                {timeLimit === 0 ? `経過時間 ${formatTime(timerSeconds)}` : `残り時間 ${formatTime(timerSeconds)}`}
+                            </span>
+                        </div>
+                    )}
                     <div className="info-row">
                         <span className="info-icon">📑</span>
                         <span>{currentIndex + 1} / {totalQuestions} 問</span>
