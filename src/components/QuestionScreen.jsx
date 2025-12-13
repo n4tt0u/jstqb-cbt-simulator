@@ -39,9 +39,16 @@ const QuestionScreen = ({
 
     // 問題が変わったら解説表示とフォーカスをリセット
     useEffect(() => {
-        setShowFeedback(false)
+        // 一問一答モードで、既に回答済みの場合は解説を表示状態にする
+        if (mode === 'practice' && userAnswers[question.id] !== undefined) {
+            setShowFeedback(true)
+        } else {
+            setShowFeedback(false)
+        }
         setFocusedOptionId(null) // 問題切り替え時はフォーカス外す
-    }, [question.id])
+        // userAnswersは依存配列に含めない（回答操作ですぐに解説が表示されるのを防ぐため）
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [question.id, mode])
 
     // 一問一答モード: 解説表示中はタイマー停止
     useEffect(() => {
@@ -60,9 +67,16 @@ const QuestionScreen = ({
                 return
             }
 
-            // 解説表示中は入力を受け付けない（矢印キーによる無駄なスクロール防止等は別途考慮）
+            // 解説表示中のキーボード操作
             if (showFeedback) {
-                if (e.key === 'ArrowRight') handleNextClick() // 解説中は右キーで次へだけ許可
+                if (e.key === 'ArrowRight') {
+                    handleNextClick()
+                } else if (e.key === 'ArrowLeft') {
+                    // 解説表示中でも戻る操作は許可
+                    e.preventDefault()
+                    if (currentIndex > 0) onPrev()
+                }
+                // それ以外のキー（回答変更など）はブロック
                 return
             }
 
@@ -245,8 +259,8 @@ const QuestionScreen = ({
                     <button
                         className="nav-button"
                         onClick={onPrev}
-                        disabled={currentIndex === 0 || showFeedback}
-                        style={{ opacity: (currentIndex === 0 || showFeedback) ? 0.5 : 1 }}
+                        disabled={currentIndex === 0}
+                        style={{ opacity: (currentIndex === 0) ? 0.5 : 1 }}
                     >
                         <span style={{ fontSize: '1.5em', fontWeight: 'bold' }}>←</span> 前へ
                     </button>
@@ -295,6 +309,8 @@ const QuestionScreen = ({
                 isOpen={showUnansweredModal}
                 message={"解答が選択されていません。\nこのまま解説を表示しますか？"}
                 onConfirm={() => {
+                    // 何も選択せずに解説を見る場合、nullを記録して「解答済み」扱いにする
+                    onOptionSelect(null)
                     setShowUnansweredModal(false)
                     setShowFeedback(true)
                 }}
