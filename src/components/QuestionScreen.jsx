@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import '../index.css'
 import { COLORS } from '../constants/theme'
 import QuestionListModal from './QuestionListModal'
@@ -23,7 +23,8 @@ const QuestionScreen = ({
     onFinish,
     timerSeconds,
     timeLimit,
-    onPauseTimer
+    onPauseTimer,
+    isExternalModalOpen = false // デフォルトはfalse
 }) => {
     const [showFeedback, setShowFeedback] = useState(false)
     const [showQuestionsList, setShowQuestionsList] = useState(false)
@@ -31,6 +32,10 @@ const QuestionScreen = ({
     const [showUnansweredModal, setShowUnansweredModal] = useState(false) // 未回答警告モーダル用
     // キーボード操作用のフォーカス管理 (1-4, null)
     const [focusedOptionId, setFocusedOptionId] = useState(null)
+    const [isKeyboardFocus, setIsKeyboardFocus] = useState(false) // キーボード操作中のみフォーカスリングを表示
+
+    // ラジオボタンのDOM参照用
+    const optionRefs = useRef({})
 
     // 問題が変わったら解説表示とフォーカスをリセット
     useEffect(() => {
@@ -48,8 +53,12 @@ const QuestionScreen = ({
     // キーボード操作の追加
     useEffect(() => {
         const handleKeyDown = (e) => {
-            // モーダル表示中は操作無効
-            if (showFinishConfirmation || showUnansweredModal || showQuestionsList) return
+            // モーダル表示中は操作無効 (内部モーダル OR 外部モーダル)
+            if (showFinishConfirmation || showUnansweredModal || showQuestionsList || isExternalModalOpen) {
+                e.preventDefault()
+                e.stopPropagation()
+                return
+            }
 
             // 解説表示中は入力を受け付けない（矢印キーによる無駄なスクロール防止等は別途考慮）
             if (showFeedback) {
@@ -58,17 +67,23 @@ const QuestionScreen = ({
             }
 
             if (e.key === 'ArrowLeft') {
+                e.preventDefault() // デフォルト動作（ラジオボタン移動など）を無効化
                 if (currentIndex > 0) onPrev()
             } else if (e.key === 'ArrowRight') {
+                e.preventDefault() // デフォルト動作（ラジオボタン移動など）を無効化
                 handleNextClick()
             } else if (e.key === 'ArrowDown') {
                 e.preventDefault() // スクロール防止
-                const nextId = focusedOptionId === null || focusedOptionId === 4 ? 1 : focusedOptionId + 1
+                setIsKeyboardFocus(true) // キーボード操作なのでフォーカスリング有効化
+                const currentId = focusedOptionId !== null ? focusedOptionId : (selectedOption !== null ? selectedOption : 4)
+                const nextId = currentId === 4 ? 1 : currentId + 1
                 setFocusedOptionId(nextId)
                 onOptionSelect(nextId)
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault()
-                const prevId = focusedOptionId === null || focusedOptionId === 1 ? 4 : focusedOptionId - 1
+                setIsKeyboardFocus(true) // キーボード操作なのでフォーカスリング有効化
+                const currentId = focusedOptionId !== null ? focusedOptionId : (selectedOption !== null ? selectedOption : 1)
+                const prevId = currentId === 1 ? 4 : currentId - 1
                 setFocusedOptionId(prevId)
                 onOptionSelect(prevId)
             }
@@ -78,7 +93,18 @@ const QuestionScreen = ({
         return () => {
             window.removeEventListener('keydown', handleKeyDown)
         }
-    }, [currentIndex, showFeedback, selectedOption, mode, totalQuestions, focusedOptionId, showFinishConfirmation, showUnansweredModal, showQuestionsList, onOptionSelect]) // モーダル状態も依存に追加
+    }, [currentIndex, showFeedback, selectedOption, mode, totalQuestions, focusedOptionId, showFinishConfirmation, showUnansweredModal, showQuestionsList, isExternalModalOpen, onOptionSelect]) // モーダル状態も依存に追加
+
+    // focusedOptionIdが変わったらDOMのフォーカスも同期させる
+    useEffect(() => {
+        if (focusedOptionId !== null && optionRefs.current[focusedOptionId]) {
+            // isKeyboardFocusのチェックは行わず、常にフォーカスを当てる
+            // これにより、キーボード操作時の「見えないフォーカス」問題を解消し、
+            // マウス操作時も正しくフォーカスが維持される。
+            // ただし、フォーカスリングの表示はCSS(outline)で isKeyboardFocus を見て制御している。
+            optionRefs.current[focusedOptionId].focus()
+        }
+    }, [focusedOptionId])
 
     const options = [
         { id: 1, text: question.option_1 },
@@ -162,7 +188,7 @@ const QuestionScreen = ({
                                 showFeedback && opt.id === selectedOption && opt.id !== question.correct_option ? COLORS.ERROR_BG :
                                     COLORS.WHITE,
                             // キーボードフォーカス時のスタイル (青枠などで強調)
-                            outline: focusedOptionId === opt.id ? `3px solid ${COLORS.PRIMARY}` : 'none',
+                            outline: (focusedOptionId === opt.id && isKeyboardFocus) ? `3px solid ${COLORS.PRIMARY}` : 'none',
                             outlineOffset: '-2px'
                         }}>
                             <input
@@ -174,9 +200,18 @@ const QuestionScreen = ({
                                     if (!showFeedback) {
                                         onOptionSelect(opt.id)
                                         setFocusedOptionId(opt.id) // マウス操作時もフォーカス同期
+                                        setIsKeyboardFocus(false) // マウス操作なのでフォーカスリング無効化
+                                    }
+                                }}
+                                onClick={() => {
+                                    if (!showFeedback) {
+                                        setFocusedOptionId(opt.id)
+                                        setIsKeyboardFocus(false) // マウス操作なのでフォーカスリング無効化
                                     }
                                 }}
                                 disabled={showFeedback}
+                                style={{ outline: 'none' }} // ブラウザデフォルトのフォーカスリングを削除
+                                ref={(el) => (optionRefs.current[opt.id] = el)}
                             />
                             <span className="option-text">
                                 {String.fromCharCode(96 + opt.id)}) {opt.text}

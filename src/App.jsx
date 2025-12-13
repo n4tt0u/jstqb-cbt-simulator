@@ -132,6 +132,7 @@ function App() {
           timerSeconds={timerSeconds}
           timeLimit={timeLimit}
           onPauseTimer={togglePause}
+          isExternalModalOpen={showTimeUpModal} // 外部モーダル（時間切れ）の状態を渡す
         />
       )}
 
