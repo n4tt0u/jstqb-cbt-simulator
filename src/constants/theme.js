@@ -1,19 +1,19 @@
 export const COLORS = {
-    PRIMARY: 'rgb(0, 109, 170)', // header-blue
-    SUB_HEADER: 'rgb(128, 174, 225)', // lighter blue
-    BACKGROUND: '#f0f4f8',
-    WHITE: '#ffffff',
-    TEXT_MAIN: '#333333',
-    TEXT_SUB: '#666666',
+    PRIMARY: 'var(--cbt-blue)', // header-blue
+    SUB_HEADER: 'var(--cbt-sub-header)', // lighter blue
+    BACKGROUND: 'var(--cbt-feedback-bg)',
+    WHITE: 'var(--cbt-card-bg)',
+    TEXT_MAIN: 'var(--cbt-text)',
+    TEXT_SUB: 'var(--cbt-text)',
 
     // Status
     SUCCESS: 'green',
-    SUCCESS_BG: '#e6ffe6',
+    SUCCESS_BG: 'var(--cbt-success-bg)',
     ERROR: 'red',
-    ERROR_BG: '#ffe6e6',
+    ERROR_BG: 'var(--cbt-error-bg)',
     WARNING: 'rgb(255, 255, 0)', // User specified yellow
 
     // UI Elements
-    BORDER: '#ddd',
-    HOVER_GRAY: '#f9f9f9'
+    BORDER: 'var(--cbt-border-color)',
+    HOVER_GRAY: 'rgba(0, 0, 0, 0.05)'
 }

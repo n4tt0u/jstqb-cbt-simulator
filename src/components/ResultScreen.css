@@ -7,7 +7,7 @@
     max-width: 800px;
     width: 95%;
     margin: 40px auto;
-    background: white;
+    background: var(--cbt-card-bg);
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -16,16 +16,16 @@
 
 .result-screen-title {
     text-align: center;
-    color: rgb(0, 109, 170);
+    color: var(--cbt-blue);
     /* COLORS.PRIMARY */
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid var(--cbt-border-color);
     padding-bottom: 20px;
     margin-bottom: 30px;
 }
 
 .score-section {
     text-align: center;
-    background: #e3effd;
+    background: rgba(0, 109, 170, 0.1);
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 30px;
@@ -33,29 +33,31 @@
 
 .score-label {
     font-size: 1.2rem;
-    color: #666;
+    color: var(--cbt-text);
     /* COLORS.TEXT_SUB */
     margin-bottom: 10px;
+    opacity: 0.8;
 }
 
 .score-value {
     font-size: 2.5rem;
     font-weight: bold;
-    color: rgb(0, 109, 170);
+    color: var(--cbt-blue);
     /* COLORS.PRIMARY */
 }
 
 .score-rate {
     font-size: 1.5rem;
     margin-top: 5px;
-    color: #666;
+    color: var(--cbt-text);
     /* COLORS.TEXT_SUB */
+    opacity: 0.8;
 }
 
 .time-section {
     margin-top: 15px;
     font-size: 1.2rem;
-    color: #333;
+    color: var(--cbt-text);
     /* COLORS.TEXT_MAIN */
 }
 
@@ -69,7 +71,7 @@
 /* Grid Section */
 .grid-title {
     margin-bottom: 15px;
-    color: #333;
+    color: var(--cbt-text);
     /* COLORS.TEXT_MAIN */
 }
 
@@ -95,17 +97,17 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 15px;
-    border-right: 1px solid #ddd;
+    border-right: 1px solid var(--cbt-border-color);
     /* COLORS.BORDER */
-    border-bottom: 1px solid #ddd;
-    background: white;
+    border-bottom: 1px solid var(--cbt-border-color);
+    background: var(--cbt-card-bg);
     cursor: pointer;
     transition: background 0.2s;
     font-size: 0.95rem;
 }
 
 .question-tile:hover {
-    background: #f5f5f5;
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .question-meta {
@@ -140,8 +142,9 @@
 }
 
 .question-number-text {
-    color: #666;
+    color: var(--cbt-text);
     /* COLORS.TEXT_SUB */
+    opacity: 0.7;
 }
 
 .tile-result-icon {
@@ -164,16 +167,16 @@
     text-align: center;
     margin-bottom: 30px;
     padding: 20px;
-    background: #f9f9f9;
+    background: var(--cbt-bg);
     border-radius: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--cbt-border-color);
     /* COLORS.BORDER */
 }
 
 .export-title {
     margin-bottom: 15px;
     font-size: 1.1rem;
-    color: #333;
+    color: var(--cbt-text);
     /* COLORS.TEXT_MAIN */
 }
 
@@ -201,7 +204,7 @@
 
 .btn-export {
     padding: 10px 25px;
-    background: rgb(128, 174, 225);
+    background: var(--cbt-sub-header);
     /* COLORS.SUB_HEADER */
     color: white;
     border: none;
@@ -223,7 +226,7 @@
 
 .btn-restart {
     padding: 12px 30px;
-    background: rgb(0, 109, 170);
+    background: var(--cbt-blue);
     /* COLORS.PRIMARY */
     color: white;
     border: none;

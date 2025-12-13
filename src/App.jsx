@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import QuestionScreen from './components/QuestionScreen'
 import StartScreen from './components/StartScreen'
 import ResultScreen from './components/ResultScreen'
@@ -9,12 +9,29 @@ function App() {
   const [questions, setQuestions] = useState([])
   const [screen, setScreen] = useState('start') // 'start' | 'question' | 'result'
   const [mode, setMode] = useState(null) // 'practice' | 'exam'
+  /* デフォルトでダークモード（ローカルストレージに保存があればそれを優先） */
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('cbt-dark-mode')
+    return saved !== null ? JSON.parse(saved) : false
+  })
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState({}) // { questionId: selectedOptionId }
   const [reviewFlags, setReviewFlags] = useState({}) // { questionId: boolean }
   const [showTimeUpModal, setShowTimeUpModal] = useState(false) // 時間切れモーダル用
   const [finalTimerSeconds, setFinalTimerSeconds] = useState(null) // 結果画面に渡す固定時間
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode')
+    } else {
+      document.body.classList.remove('dark-mode')
+    }
+    // 状態が変わるたびに保存
+    localStorage.setItem('cbt-dark-mode', JSON.stringify(isDarkMode))
+  }, [isDarkMode])
+
+  const toggleDarkMode = () => setIsDarkMode(prev => !prev)
 
   const handleFinish = (forceZero = false) => {
     stopTimer()
@@ -109,6 +126,8 @@ function App() {
         <StartScreen
           onQuestionsLoaded={handleQuestionsLoaded}
           onStart={handleStart}
+          isDarkMode={isDarkMode}
+          onToggleDarkMode={toggleDarkMode}
         />
       )}
 

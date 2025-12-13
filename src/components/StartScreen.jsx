@@ -4,7 +4,7 @@ import { parseQuestionRow } from '../utils/csvFormatter'
 import { parseAnkiJson } from '../utils/ankiImport'
 import './StartScreen.css'
 
-const StartScreen = ({ onQuestionsLoaded, onStart }) => {
+const StartScreen = ({ onQuestionsLoaded, onStart, isDarkMode, onToggleDarkMode }) => {
     const [timeLimit, setTimeLimit] = useState(0) // デフォルト0（無制限）
     const [loading, setLoading] = useState(false)
     const [loadedCount, setLoadedCount] = useState(0)
@@ -95,6 +95,27 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
 
     return (
         <div className="start-screen-container cbt-container">
+            <button
+                onClick={onToggleDarkMode}
+                style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    padding: '5px',
+                    borderRadius: '50%',
+                    transition: 'transform 0.2s',
+                    zIndex: 10
+                }}
+                title={isDarkMode ? "ライトモードに切り替え" : "ダークモードに切り替え"}
+                onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+                onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+            >
+                {isDarkMode ? '🌞' : '🌙'}
+            </button>
             <div className="start-screen-card">
                 <h1 className="start-screen-title">CBT 再現演習</h1>
 
@@ -157,14 +178,8 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                             </span>
                         </button>
 
-                        <div className="exam-mode-group" style={{ 
-                            border: '1px solid #ddd', 
-                            padding: '10px', 
-                            borderRadius: '4px',
-                            marginTop: '10px',
-                            backgroundColor: '#fafafa'
-                        }}>
-                             <div className="timer-section" style={{ marginTop: 0, marginBottom: '10px', background: 'transparent', padding: 0 }}>
+                        <div className="exam-mode-group">
+                            <div className="timer-section" style={{ marginTop: 0, marginBottom: '10px', background: 'transparent', padding: 0 }}>
                                 <label style={{ fontWeight: 'bold', marginRight: '10px' }}>制限時間 (分):</label>
                                 <input
                                     type="number"
