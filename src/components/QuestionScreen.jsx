@@ -86,6 +86,8 @@ const QuestionScreen = ({
                 const prevId = currentId === 1 ? 4 : currentId - 1
                 setFocusedOptionId(prevId)
                 onOptionSelect(prevId)
+            } else if (e.key === 'f' || e.key === 'F') {
+                onFlagToggle()
             }
         }
 
@@ -93,7 +95,7 @@ const QuestionScreen = ({
         return () => {
             window.removeEventListener('keydown', handleKeyDown)
         }
-    }, [currentIndex, showFeedback, selectedOption, mode, totalQuestions, focusedOptionId, showFinishConfirmation, showUnansweredModal, showQuestionsList, isExternalModalOpen, onOptionSelect]) // モーダル状態も依存に追加
+    }, [currentIndex, showFeedback, selectedOption, mode, totalQuestions, focusedOptionId, showFinishConfirmation, showUnansweredModal, showQuestionsList, isExternalModalOpen, onOptionSelect, onFlagToggle]) // モーダル状態も依存に追加
 
     // focusedOptionIdが変わったらDOMのフォーカスも同期させる
     useEffect(() => {
