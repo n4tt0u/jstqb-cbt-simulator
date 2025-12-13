@@ -148,12 +148,14 @@ const QuestionScreen = ({
                     onFinish()
                 }
             } else {
+                setShowFeedback(false)
                 onNext()
             }
         }
     }
 
     const handleJumpTo = (index) => {
+        setShowFeedback(false)
         onJump(index)
         setShowQuestionsList(false)
     }
