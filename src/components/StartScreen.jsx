@@ -5,7 +5,6 @@ import { parseAnkiJson } from '../utils/ankiImport'
 import './StartScreen.css'
 
 const StartScreen = ({ onQuestionsLoaded, onStart }) => {
-    const [mode, setMode] = useState('practice')
     const [timeLimit, setTimeLimit] = useState(0) // デフォルト0（無制限）
     const [loading, setLoading] = useState(false)
     const [loadedCount, setLoadedCount] = useState(0)
@@ -90,7 +89,7 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
         }
     }
 
-    const handleStart = () => {
+    const handleStart = (mode) => {
         onStart(mode, timeLimit)
     }
 
@@ -143,35 +142,29 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                     {loadedCount > 0 && <p className="status-message status-success">✓ {loadedCount} 問の問題をロードしました</p>}
                 </div>
 
-                {/* Step 2: モード選択 */}
+                {/* Step 2: モード選択して開始 */}
                 <div>
-                    <h2 className="step-title">Step 2: 演習モード選択</h2>
+                    <h2 className="step-title">Step 2: 演習モードを選択して開始</h2>
                     <div className="button-group">
                         <button
-                            onClick={() => setMode('practice')}
+                            onClick={() => handleStart('practice')}
                             disabled={loadedCount === 0}
-                            className={`mode-button practice ${mode === 'practice' && loadedCount > 0 ? 'active' : ''}`}
+                            className="mode-button practice"
                         >
-                            一問一答モード
+                            一問一答モードで開始
                             <span className="mode-description">
                                 1問ごとに解説を表示します
                             </span>
                         </button>
 
-                        <button
-                            onClick={() => setMode('exam')}
-                            disabled={loadedCount === 0}
-                            className={`mode-button exam ${mode === 'exam' && loadedCount > 0 ? 'active' : ''}`}
-                        >
-                            本番モード
-                            <span className="mode-description">
-                                全て解いた後に結果を表示します
-                            </span>
-                        </button>
-
-                        {/* タイマー設定 (模試モードのみ) */}
-                        {mode === 'exam' && (
-                            <div className="timer-section">
+                        <div className="exam-mode-group" style={{ 
+                            border: '1px solid #ddd', 
+                            padding: '10px', 
+                            borderRadius: '4px',
+                            marginTop: '10px',
+                            backgroundColor: '#fafafa'
+                        }}>
+                             <div className="timer-section" style={{ marginTop: 0, marginBottom: '10px', background: 'transparent', padding: 0 }}>
                                 <label style={{ fontWeight: 'bold', marginRight: '10px' }}>制限時間 (分):</label>
                                 <input
                                     type="number"
@@ -182,20 +175,25 @@ const StartScreen = ({ onQuestionsLoaded, onStart }) => {
                                         setTimeLimit(Math.min(9999, Math.max(0, val)))
                                     }}
                                     className="timer-input"
+                                    disabled={loadedCount === 0}
                                 />
                                 <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '5px' }}>
-                                    {timeLimit === 0 ? '※ 0分は時間制限なし (カウントアップ計測)' : `※ ${timeLimit}分で試験終了`}
+                                    {timeLimit === 0 ? '※ 0分は時間制限なし' : `※ ${timeLimit}分で試験終了`}
                                 </div>
                             </div>
-                        )}
 
-                        <button
-                            onClick={handleStart}
-                            disabled={loadedCount === 0}
-                            className="btn-start"
-                        >
-                            試験開始
-                        </button>
+                            <button
+                                onClick={() => handleStart('exam')}
+                                disabled={loadedCount === 0}
+                                className="mode-button exam"
+                                style={{ width: '100%' }}
+                            >
+                                本番モードで開始
+                                <span className="mode-description">
+                                    全て解いた後に結果を表示します
+                                </span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
