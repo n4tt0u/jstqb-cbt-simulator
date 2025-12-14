@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Papa from 'papaparse'
-import { parseQuestionRow } from '../utils/csvFormatter'
+import { parseQuestionRow, shuffleQuestionOptions } from '../utils/csvFormatter'
 import { parseAnkiJson } from '../utils/ankiImport'
 import './StartScreen.css'
 
@@ -16,8 +16,10 @@ const StartScreen = ({ onQuestionsLoaded, onStart, isDarkMode, onToggleDarkMode 
             skipEmptyLines: true,
             complete: (results) => {
                 if (results.data && results.data.length > 0) {
-                    // ユーティリティを使用してデータを変換
-                    const formattedData = results.data.map((q, index) => parseQuestionRow(q, index))
+                    // ユーティリティを使用してデータを変換し、選択肢をシャッフル
+                    const formattedData = results.data
+                        .map((q, index) => parseQuestionRow(q, index))
+                        .map(q => shuffleQuestionOptions(q))
 
                     onQuestionsLoaded(formattedData)
                     setLoadedCount(formattedData.length)
@@ -78,7 +80,7 @@ const StartScreen = ({ onQuestionsLoaded, onStart, isDarkMode, onToggleDarkMode 
                 return
             }
 
-            const questions = parseAnkiJson(text)
+            const questions = parseAnkiJson(text).map(q => shuffleQuestionOptions(q))
             onQuestionsLoaded(questions)
             setLoadedCount(questions.length)
             setLoading(false)
