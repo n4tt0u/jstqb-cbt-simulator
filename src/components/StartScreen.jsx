@@ -21,6 +21,12 @@ const StartScreen = ({ onQuestionsLoaded, onStart, isDarkMode, onToggleDarkMode 
                         .map((q, index) => parseQuestionRow(q, index))
                         .map(q => shuffleQuestionOptions(q))
 
+                    // Fisher-Yates shuffle for questions
+                    for (let i = formattedData.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [formattedData[i], formattedData[j]] = [formattedData[j], formattedData[i]];
+                    }
+
                     onQuestionsLoaded(formattedData)
                     setLoadedCount(formattedData.length)
                     setLoading(false)
@@ -81,6 +87,12 @@ const StartScreen = ({ onQuestionsLoaded, onStart, isDarkMode, onToggleDarkMode 
             }
 
             const questions = parseAnkiJson(text).map(q => shuffleQuestionOptions(q))
+
+            // Fisher-Yates shuffle for questions
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
             onQuestionsLoaded(questions)
             setLoadedCount(questions.length)
             setLoading(false)
