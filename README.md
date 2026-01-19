@@ -25,21 +25,9 @@ React + Vite で構築されており、独自の問題セットを作成・練�
   - **CSVファイル**: 画面上から任意のCSVファイルをアップロード
   - **AnkiNLM対応**: AnkiNLMからコピーしたJSON形式の問題をクリップボード経由でインポート
 
-## 🚀 使い方
+## 📖 使い方
 
-### 1. 起動方法
-
-```bash
-# 依存関係のインストール
-npm install
-
-# ローカルサーバーの起動
-npm run dev
-```
-
-ブラウザで `http://localhost:5173` にアクセスします。
-
-### 2. 問題データの形式
+### 問題データの形式
 
 CSVファイルは以下の形式にします（ヘッダー行が必要）:
 
@@ -53,15 +41,15 @@ question_text,option_a,option_b,option_c,option_d,correct_option,explanation
 - `correct_option`: 正解の記号 (`a`, `b`, `c`, `d`) ※小文字
 - `explanation`: 解説文
 
-### 3. 演習の流れ
+### 演習の流れ
 
-1. **Step 1: 問題データの準備**
+1. **問題データの準備**
    - デフォルト問題集をロード、またはCSVファイルをアップロード、またはAnkiNLMからインポート
-2. **Step 2: 演習モードを選択**
+2. **演習モードを選択**
    - 一問一答モード: 1問ごとに正解・不正解と解説を表示
    - 本番モード: 全問題解答後に結果を表示（制限時間設定可能）
 
-### 4. 操作方法
+### 操作方法
 
 **キーボードショートカット:**
 - `↑` `↓`: 選択肢の選択
@@ -80,15 +68,6 @@ question_text,option_a,option_b,option_c,option_d,correct_option,explanation
 - **Styling**: Pure CSS（CSSフレームワーク不使用）
 - **Data Parsing**: PapaParse 5.5
 - **Linting**: ESLint 9
-
-## 📦 デプロイ (公開)
-
-ビルドコマンドを実行すると `dist` フォルダが生成されます。
-このフォルダを Vercel や Netlify などのホスティングサービスにアップロードするだけで公開可能です。
-
-```bash
-npm run build
-```
 
 ## 📜 License
 
